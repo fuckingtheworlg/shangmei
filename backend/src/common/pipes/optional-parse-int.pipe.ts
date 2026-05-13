@@ -9,11 +9,14 @@ import { BadRequestException, Injectable, PipeTransform } from '@nestjs/common';
  * 替代 `new ParseIntPipe({ optional: true })`，避免不同版本 NestJS 行为差异
  */
 @Injectable()
-export class OptionalParseIntPipe implements PipeTransform<string | undefined, number | undefined> {
-  transform(value: string | undefined): number | undefined {
-    if (value === undefined || value === null || (typeof value === 'string' && value.trim() === '')) {
-      return undefined;
-    }
+export class OptionalParseIntPipe implements PipeTransform<unknown, number | undefined> {
+  transform(value: unknown): number | undefined {
+    // 1. 空值：undefined / null / 空字符串
+    if (value === undefined || value === null) return undefined;
+    if (typeof value === 'string' && value.trim() === '') return undefined;
+    // 2. 全局 ValidationPipe transform:true 会把 undefined cast 成 NaN，需要兜底
+    if (typeof value === 'number' && Number.isNaN(value)) return undefined;
+
     const n = Number(value);
     if (!Number.isFinite(n) || !Number.isInteger(n)) {
       throw new BadRequestException(`参数必须为整数: ${value}`);
