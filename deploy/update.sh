@@ -5,7 +5,13 @@ APP_DIR="${APP_DIR:-/opt/shangmei}"
 
 cd "$APP_DIR"
 echo "[update] git pull..."
-git pull --rebase
+# 自动暂存本地修改，避免被 npm install / 手动改动卡住
+if ! git diff --quiet HEAD || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+  echo "[update] detected local changes, stashing..."
+  git stash push --include-untracked -m "auto-stash by update.sh $(date +%s)" || true
+fi
+git fetch origin
+git reset --hard origin/main
 
 echo "[update] backend build..."
 NPM_MIRROR="${NPM_MIRROR:-https://registry.npmmirror.com}"
