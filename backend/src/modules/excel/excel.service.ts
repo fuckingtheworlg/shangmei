@@ -28,7 +28,7 @@ export class ExcelService {
       { header: '备注', key: 'remark', width: 24 },
     ];
     ws.addRow({ factory: '第一分厂', name: '注水泵', spec: 'ZB-200', unit: '台', qty: 5, remark: '' });
-    return (await wb.xlsx.writeBuffer()) as Buffer;
+    return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
   async partTemplate(): Promise<Buffer> {
@@ -52,7 +52,7 @@ export class ExcelService {
       qty: 20,
       remark: '',
     });
-    return (await wb.xlsx.writeBuffer()) as Buffer;
+    return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
   // ---------- 导出 ----------
@@ -83,7 +83,7 @@ export class ExcelService {
         remark: r.remark,
       });
     }
-    return (await wb.xlsx.writeBuffer()) as Buffer;
+    return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
   async exportPartStock(current: UserPayload, factoryId?: number): Promise<Buffer> {
@@ -115,13 +115,13 @@ export class ExcelService {
         remark: r.remark,
       });
     }
-    return (await wb.xlsx.writeBuffer()) as Buffer;
+    return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
   // ---------- 导入 ----------
   async importDeviceStock(current: UserPayload, buffer: Buffer): Promise<ImportResult> {
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(buffer);
+    await wb.xlsx.load(buffer as any);
     const ws = wb.worksheets[0];
     const result: ImportResult = { total: 0, success: 0, failed: 0, errors: [] };
 
@@ -146,11 +146,15 @@ export class ExcelService {
           update: {},
           create: { name: factoryName },
         });
-        const device = await this.prisma.deviceModel.upsert({
-          where: { name_spec: { name, spec } },
-          update: { unit },
-          create: { name, spec, unit },
-        });
+
+        // 复合 unique 含 nullable 字段（spec），不能用 upsert/findUnique，改用 findFirst
+        let device = await this.prisma.deviceModel.findFirst({ where: { name, spec } });
+        if (!device) {
+          device = await this.prisma.deviceModel.create({ data: { name, spec, unit } });
+        } else if (device.unit !== unit) {
+          device = await this.prisma.deviceModel.update({ where: { id: device.id }, data: { unit } });
+        }
+
         const existing = await this.prisma.factoryDeviceStock.findUnique({
           where: { factoryId_deviceModelId: { factoryId: factory.id, deviceModelId: device.id } },
         });
@@ -187,7 +191,7 @@ export class ExcelService {
 
   async importPartStock(current: UserPayload, buffer: Buffer): Promise<ImportResult> {
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.load(buffer);
+    await wb.xlsx.load(buffer as any);
     const ws = wb.worksheets[0];
     const result: ImportResult = { total: 0, success: 0, failed: 0, errors: [] };
 
@@ -221,11 +225,20 @@ export class ExcelService {
           });
           if (device) deviceModelId = device.id;
         }
-        const part = await this.prisma.partModel.upsert({
-          where: { name_spec_deviceModelId: { name, spec, deviceModelId } },
-          update: { unit },
-          create: { name, spec, unit, deviceModelId },
+
+        let part = await this.prisma.partModel.findFirst({
+          where: { name, spec, deviceModelId },
         });
+        if (!part) {
+          part = await this.prisma.partModel.create({
+            data: { name, spec, unit, deviceModelId },
+          });
+        } else if (part.unit !== unit) {
+          part = await this.prisma.partModel.update({
+            where: { id: part.id },
+            data: { unit },
+          });
+        }
         const existing = await this.prisma.factoryPartStock.findUnique({
           where: { factoryId_partModelId: { factoryId: factory.id, partModelId: part.id } },
         });

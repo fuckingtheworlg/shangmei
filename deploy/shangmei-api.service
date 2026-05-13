@@ -1,0 +1,18 @@
+[Unit]
+Description=Shangmei Device Management API (NestJS)
+After=network.target mysql.service
+Requires=mysql.service
+
+[Service]
+Type=simple
+WorkingDirectory=__APP_DIR__/backend
+EnvironmentFile=__APP_DIR__/backend/.env
+ExecStart=/usr/bin/node __APP_DIR__/backend/dist/main.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/var/log/shangmei-api.log
+StandardError=append:/var/log/shangmei-api.err.log
+User=root
+
+[Install]
+WantedBy=multi-user.target
