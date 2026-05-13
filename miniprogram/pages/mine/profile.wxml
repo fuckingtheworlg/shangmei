@@ -3,8 +3,7 @@
     <view class="row" style="justify-content:space-between;" bindtap="chooseAvatar">
       <text class="label">头像</text>
       <view class="row" style="gap:16rpx;">
-        <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarFull}}" mode="aspectFill" />
-        <view wx:else class="avatar avatar-fallback">{{name && name.charAt(0)}}</view>
+        <image class="avatar" src="{{avatarFull || '/images/mine.png'}}" mode="aspectFill" />
         <text class="arrow">›</text>
       </view>
     </view>
