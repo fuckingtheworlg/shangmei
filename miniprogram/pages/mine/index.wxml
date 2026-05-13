@@ -1,10 +1,12 @@
 <view class="container">
-  <view class="profile-card">
-    <view class="avatar">{{user.name && user.name.charAt(0)}}</view>
+  <view class="profile-card" bindtap="goProfile">
+    <image wx:if="{{avatarFull}}" class="avatar avatar-img" src="{{avatarFull}}" mode="aspectFill" />
+    <view wx:else class="avatar">{{user.name && user.name.charAt(0)}}</view>
     <view class="flex-1" style="margin-left:24rpx;">
       <view class="name">{{user.name}}</view>
       <view class="sub">{{user.factoryName}} · {{roleText}}</view>
     </view>
+    <view style="color:rgba(255,255,255,0.85); font-size:30rpx;">编辑 ›</view>
   </view>
 
   <view class="card menu" wx:if="{{isCenter}}">

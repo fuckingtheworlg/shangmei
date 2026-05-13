@@ -1,0 +1,18 @@
+.avatar-card { padding: 30rpx 24rpx; }
+.avatar {
+  width: 100rpx; height: 100rpx; border-radius: 50%;
+  background: #eee;
+}
+.avatar-fallback {
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg,#1890ff,#69c0ff);
+  color: #fff; font-weight: 600; font-size: 40rpx;
+}
+.arrow { color: #ccc; font-size: 36rpx; }
+.form-row {
+  display: flex; align-items: center;
+  padding: 24rpx 0; border-bottom: 1rpx solid #f0f0f0;
+}
+.form-row:last-child { border-bottom: none; }
+.label { width: 160rpx; color: #555; }
+.value { flex: 1; color: #2c3e50; text-align: right; }

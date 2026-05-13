@@ -6,6 +6,7 @@
     "pages/device/detail",
     "pages/change/index",
     "pages/mine/index",
+    "pages/mine/profile",
     "pages/transfer/index",
     "pages/model/device-form",
     "pages/model/part-form"

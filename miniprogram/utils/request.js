@@ -1,12 +1,26 @@
 const app = getApp();
 
+// wx.request 不会自动剔除 undefined/null/'' 字段，会把它们序列化成 ?foo=undefined
+// 导致后端拿到字符串 "undefined" 当成有效值过滤，必须在发请求前清掉
+function cleanParams(data) {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return data;
+  const out = {};
+  Object.keys(data).forEach((k) => {
+    const v = data[k];
+    if (v === undefined || v === null) return;
+    if (typeof v === 'string' && v === '') return;
+    out[k] = v;
+  });
+  return out;
+}
+
 function request(method, url, data = {}, options = {}) {
   return new Promise((resolve, reject) => {
     const isExport = !!options.responseType;
     wx.request({
       url: app.globalData.apiBase + url,
       method,
-      data,
+      data: cleanParams(data),
       header: {
         'content-type': 'application/json',
         Authorization: app.globalData.token ? `Bearer ${app.globalData.token}` : ''

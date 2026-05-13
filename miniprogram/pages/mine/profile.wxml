@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="card avatar-card">
+    <view class="row" style="justify-content:space-between;" bindtap="chooseAvatar">
+      <text class="label">头像</text>
+      <view class="row" style="gap:16rpx;">
+        <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarFull}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-fallback">{{name && name.charAt(0)}}</view>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="form-row">
+      <text class="label">姓名</text>
+      <input class="value" placeholder="请输入" value="{{name}}" maxlength="20" bindinput="onName" />
+    </view>
+    <view class="form-row">
+      <text class="label">账号</text>
+      <text class="value muted">{{user.username}}</text>
+    </view>
+    <view class="form-row">
+      <text class="label">所属厂</text>
+      <text class="value muted">{{user.factoryName}}</text>
+    </view>
+    <view class="form-row">
+      <text class="label">角色</text>
+      <text class="value muted">{{roleText}}</text>
+    </view>
+  </view>
+
+  <button class="btn-primary" style="margin:30rpx 20rpx;" bindtap="save" loading="{{saving}}">保存</button>
+</view>

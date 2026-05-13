@@ -53,12 +53,15 @@ GRANT ALL ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 SQL
 
-log "5/7 写入后端 .env"
+log "5/7 写入后端 .env 并创建上传目录"
+mkdir -p "$APP_DIR/backend/uploads/avatars"
+chown -R root:root "$APP_DIR/backend/uploads"
 cat > "$APP_DIR/backend/.env" <<ENV
 DATABASE_URL="mysql://${DB_USER}:${DB_PASSWORD}@localhost:3306/${DB_NAME}"
 JWT_SECRET="${JWT_SECRET}"
 JWT_EXPIRES_IN="7d"
 PORT=${API_PORT}
+UPLOAD_DIR="${APP_DIR}/backend/uploads"
 ENV
 
 log "6/7 安装后端依赖（首次约 1-2 分钟，看到 added xxx packages 才算完）"

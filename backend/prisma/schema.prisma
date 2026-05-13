@@ -42,6 +42,7 @@ model User {
   factoryId    Int      @map("factory_id")
   factory      Factory  @relation(fields: [factoryId], references: [id])
   phone        String?
+  avatarUrl    String?  @map("avatar_url")
   active       Boolean  @default(true)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

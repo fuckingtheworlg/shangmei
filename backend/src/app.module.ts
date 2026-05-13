@@ -12,6 +12,7 @@ import { ChangeLogModule } from './modules/change-log/change-log.module';
 import { TransferModule } from './modules/transfer/transfer.module';
 import { MessageModule } from './modules/message/message.module';
 import { ExcelModule } from './modules/excel/excel.module';
+import { UploadModule } from './modules/upload/upload.module';
 import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
 
 @Module({
@@ -28,6 +29,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
     TransferModule,
     MessageModule,
     ExcelModule,
+    UploadModule,
   ],
   providers: [
     {

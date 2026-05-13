@@ -59,6 +59,29 @@ export class AuthService {
       factoryName: user.factory.name,
       isCenter: user.factory.isCenter,
       phone: user.phone,
+      avatarUrl: user.avatarUrl,
+    };
+  }
+
+  async updateProfile(userId: number, data: { name?: string; avatarUrl?: string | null }) {
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: data.name,
+        avatarUrl: data.avatarUrl,
+      },
+      include: { factory: true },
+    });
+    return {
+      id: updated.id,
+      username: updated.username,
+      name: updated.name,
+      role: updated.role,
+      factoryId: updated.factoryId,
+      factoryName: updated.factory.name,
+      isCenter: updated.factory.isCenter,
+      phone: updated.phone,
+      avatarUrl: updated.avatarUrl,
     };
   }
 }
