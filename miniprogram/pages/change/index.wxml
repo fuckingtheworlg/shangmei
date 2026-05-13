@@ -1,0 +1,54 @@
+<view class="container">
+  <view class="tab-bar">
+    <view class="tab {{tab === 'change' ? 'active' : ''}}" bindtap="switchTab" data-tab="change">设备变动</view>
+    <view class="tab {{tab === 'message' ? 'active' : ''}}" bindtap="switchTab" data-tab="message">跨厂消息</view>
+  </view>
+
+  <block wx:if="{{tab === 'change'}}">
+    <view wx:if="{{isCenter}}" class="card picker-wrap" style="margin:20rpx;">
+      <picker bindchange="onFactoryChange" range="{{factories}}" range-key="name" value="{{factoryIndex}}">
+        <view class="row" style="justify-content:space-between;">
+          <text class="muted">查看工厂</text>
+          <text>{{currentFactory.name || '全部'}} ›</text>
+        </view>
+      </picker>
+    </view>
+
+    <view wx:if="{{!logs.length}}" class="empty">暂无变动</view>
+    <view wx:for="{{logs}}" wx:key="id" class="card log-card">
+      <view class="row" style="justify-content:space-between;">
+        <view class="flex-1">
+          <view>
+            <text class="tag {{item.action === 'TRANSFER_IN' ? 'tag-green' : item.action === 'TRANSFER_OUT' ? 'tag-orange' : item.action === 'IMPORT' ? 'tag-blue' : item.action === 'DELETE' ? 'tag-red' : 'tag-blue'}}">{{item.actionText}}</text>
+            <text style="margin-left:10rpx; font-weight:500;">{{item.targetName}}</text>
+          </view>
+          <view class="muted" style="margin-top:6rpx;">
+            <text wx:if="{{isCenter}}">{{item.factoryName}} · </text>
+            {{item.userName}} · {{item.timeText}}
+          </view>
+          <view wx:if="{{item.remark}}" class="muted" style="margin-top:4rpx;">备注：{{item.remark}}</view>
+        </view>
+        <view style="text-align:right;">
+          <view class="muted">{{item.beforeQty}} → {{item.afterQty}}</view>
+          <view class="qty {{item.delta > 0 ? 'green' : item.delta < 0 ? 'red' : ''}}">{{item.delta > 0 ? '+' : ''}}{{item.delta}}</view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{!messages.length}}" class="empty">暂无消息</view>
+    <view wx:for="{{messages}}" wx:key="id" class="card msg-card">
+      <view style="font-weight:500;">
+        <text class="tag tag-blue">跨厂调动</text>
+        {{' '}}{{item.targetName}}
+      </view>
+      <view class="muted" style="margin-top:8rpx;">
+        {{item.fromFactoryName}} <text style="color:#1890ff;">→</text> {{item.toFactoryName}}
+        ·  数量 {{item.quantity}}
+      </view>
+      <view class="muted" style="margin-top:4rpx;">操作人：{{item.operatorName}} · {{item.timeText}}</view>
+      <view wx:if="{{item.remark}}" class="muted" style="margin-top:4rpx;">备注：{{item.remark}}</view>
+    </view>
+  </block>
+</view>

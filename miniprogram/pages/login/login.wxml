@@ -1,0 +1,30 @@
+<view class="login-bg">
+  <view class="login-header">
+    <view class="login-title">彬渭中心</view>
+    <view class="login-sub">设备配件管理系统</view>
+  </view>
+
+  <view class="login-card">
+    <view class="input-row">
+      <text class="label">账号</text>
+      <input
+        class="input"
+        placeholder="请输入账号"
+        value="{{username}}"
+        bindinput="onUser"
+      />
+    </view>
+    <view class="input-row">
+      <text class="label">密码</text>
+      <input
+        class="input"
+        password
+        placeholder="请输入密码"
+        value="{{password}}"
+        bindinput="onPwd"
+      />
+    </view>
+    <button class="btn-primary" bindtap="submit" loading="{{loading}}">登录</button>
+    <view class="tip muted">演示账号：admin / admin123</view>
+  </view>
+</view>

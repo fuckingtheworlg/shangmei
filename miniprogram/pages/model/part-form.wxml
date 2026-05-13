@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="card">
+    <view class="form-row">
+      <text class="label">所属设备</text>
+      <picker bindchange="onDevChange" range="{{devices}}" range-key="label" value="{{devIndex}}">
+        <view class="value">{{devices[devIndex].label || '(独立配件)'}} ›</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="label">配件名称</text>
+      <input class="value" placeholder="如：轴承" value="{{name}}" bindinput="onName" />
+    </view>
+    <view class="form-row">
+      <text class="label">规格型号</text>
+      <input class="value" placeholder="如：NSK-6205" value="{{spec}}" bindinput="onSpec" />
+    </view>
+    <view class="form-row">
+      <text class="label">单位</text>
+      <input class="value" placeholder="个" value="{{unit}}" bindinput="onUnit" />
+    </view>
+    <view class="form-row">
+      <text class="label">初始数量</text>
+      <input class="value" type="digit" placeholder="可选，建库存" value="{{quantity}}" bindinput="onQty" />
+    </view>
+    <view class="form-row">
+      <text class="label">备注</text>
+      <input class="value" placeholder="可选" value="{{remark}}" bindinput="onRemark" />
+    </view>
+    <button class="btn-primary" style="margin-top:30rpx;" bindtap="submit" loading="{{loading}}">保存</button>
+  </view>
+</view>

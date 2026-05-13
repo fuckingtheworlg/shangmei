@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="filter-bar">
+    <view wx:if="{{isCenter}}" class="picker-wrap card" style="margin:20rpx;">
+      <picker bindchange="onFactoryChange" range="{{factories}}" range-key="name" value="{{factoryIndex}}">
+        <view class="row" style="justify-content:space-between;">
+          <text class="muted">查看工厂</text>
+          <text>{{currentFactory.name || '全部'}} ›</text>
+        </view>
+      </picker>
+    </view>
+    <view class="search-wrap card" style="margin:20rpx;">
+      <input
+        class="search-input"
+        placeholder="搜索设备名称/规格"
+        value="{{keyword}}"
+        bindinput="onKeyword"
+        bindconfirm="loadList"
+      />
+    </view>
+  </view>
+
+  <view wx:if="{{isWriter}}" class="card add-bar">
+    <button class="btn-primary" size="mini" bindtap="goAddStock">+ 新增设备库存</button>
+  </view>
+
+  <view wx:if="{{!list.length}}" class="empty">暂无数据</view>
+  <view wx:for="{{list}}" wx:key="id" class="card device-card" bindtap="goDetail" data-id="{{item.deviceModelId}}" data-stockid="{{item.id}}" data-factoryid="{{item.factoryId}}">
+    <view class="row" style="justify-content:space-between;">
+      <view class="flex-1">
+        <view class="dev-name">{{item.name}} <text class="muted">{{item.spec || ''}}</text></view>
+        <view class="muted" style="margin-top:6rpx;">
+          <text wx:if="{{isCenter}}">{{item.factoryName}} · </text>
+          单位：{{item.unit}}
+        </view>
+      </view>
+      <view class="qty-block">
+        <view class="qty-num">{{item.quantity}}</view>
+        <view class="muted" style="text-align:center;">{{item.unit}}</view>
+      </view>
+    </view>
+    <view wx:if="{{isWriter}}" class="row qty-actions" catchtap="noop">
+      <button class="qty-btn minus" catchtap="adjust" data-id="{{item.id}}" data-delta="-1">−</button>
+      <button class="qty-btn plus" catchtap="adjust" data-id="{{item.id}}" data-delta="1">+</button>
+      <button class="qty-btn edit" catchtap="editStock" data-item="{{item}}">改</button>
+    </view>
+  </view>
+</view>

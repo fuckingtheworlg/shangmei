@@ -1,0 +1,22 @@
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1890ff 0%, #69c0ff 60%, #f4f6f8 100%);
+  padding: 160rpx 40rpx 0;
+}
+.login-header { text-align: center; color: #fff; margin-bottom: 80rpx; }
+.login-title { font-size: 56rpx; font-weight: 700; letter-spacing: 8rpx; }
+.login-sub { font-size: 28rpx; opacity: 0.9; margin-top: 14rpx; }
+.login-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 50rpx 40rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0,0,0,0.08);
+}
+.input-row {
+  display: flex; align-items: center;
+  padding: 24rpx 0; border-bottom: 1rpx solid #eee;
+}
+.label { width: 100rpx; color: #666; }
+.input { flex: 1; }
+.tip { text-align: center; margin-top: 24rpx; }
+.login-card .btn-primary { margin-top: 40rpx; }

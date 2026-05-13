@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 工厂（含彬渭中心，isCenter=true 表示中心）
+model Factory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  code      String?  @unique
+  isCenter  Boolean  @default(false) @map("is_center")
+  remark    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users          User[]
+  deviceStocks   FactoryDeviceStock[]
+  partStocks     FactoryPartStock[]
+  changeLogs     ChangeLog[]
+  transfersFrom  TransferMessage[] @relation("TransferFrom")
+  transfersTo    TransferMessage[] @relation("TransferTo")
+
+  @@map("factory")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  FACTORY_ADMIN
+  FACTORY_USER
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         UserRole @default(FACTORY_USER)
+  factoryId    Int      @map("factory_id")
+  factory      Factory  @relation(fields: [factoryId], references: [id])
+  phone        String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  changeLogs    ChangeLog[]
+  transfers     TransferMessage[]
+
+  @@map("user")
+}
+
+// 设备型号字典
+model DeviceModel {
+  id        Int      @id @default(autoincrement())
+  name      String
+  spec      String?
+  unit      String   @default("台")
+  remark    String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  stocks   FactoryDeviceStock[]
+  parts    PartModel[]
+
+  @@unique([name, spec])
+  @@map("device_model")
+}
+
+// 配件型号字典（可选归属某个设备型号）
+model PartModel {
+  id            Int      @id @default(autoincrement())
+  name          String
+  spec          String?
+  unit          String   @default("个")
+  deviceModelId Int?     @map("device_model_id")
+  deviceModel   DeviceModel? @relation(fields: [deviceModelId], references: [id])
+  remark        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  stocks   FactoryPartStock[]
+
+  @@unique([name, spec, deviceModelId])
+  @@map("part_model")
+}
+
+// 各厂设备库存
+model FactoryDeviceStock {
+  id             Int     @id @default(autoincrement())
+  factoryId      Int     @map("factory_id")
+  factory        Factory @relation(fields: [factoryId], references: [id])
+  deviceModelId  Int     @map("device_model_id")
+  deviceModel    DeviceModel @relation(fields: [deviceModelId], references: [id])
+  quantity       Int     @default(0)
+  remark         String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@unique([factoryId, deviceModelId])
+  @@map("factory_device_stock")
+}
+
+// 各厂配件库存
+model FactoryPartStock {
+  id           Int     @id @default(autoincrement())
+  factoryId    Int     @map("factory_id")
+  factory      Factory @relation(fields: [factoryId], references: [id])
+  partModelId  Int     @map("part_model_id")
+  partModel    PartModel @relation(fields: [partModelId], references: [id])
+  quantity     Int     @default(0)
+  remark       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([factoryId, partModelId])
+  @@map("factory_part_stock")
+}
+
+enum ChangeTargetType {
+  DEVICE
+  PART
+}
+
+enum ChangeAction {
+  CREATE
+  UPDATE
+  DELETE
+  TRANSFER_IN
+  TRANSFER_OUT
+  IMPORT
+}
+
+// 操作日志：每一次库存变化都写一条
+model ChangeLog {
+  id           Int      @id @default(autoincrement())
+  factoryId    Int      @map("factory_id")
+  factory      Factory  @relation(fields: [factoryId], references: [id])
+  userId       Int      @map("user_id")
+  user         User     @relation(fields: [userId], references: [id])
+  targetType   ChangeTargetType @map("target_type")
+  targetId     Int      @map("target_id")
+  targetName   String   @map("target_name")
+  beforeQty    Int      @map("before_qty")
+  afterQty     Int      @map("after_qty")
+  delta        Int
+  action       ChangeAction
+  remark       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([factoryId, createdAt])
+  @@index([userId])
+  @@map("change_log")
+}
+
+// 跨厂调动消息
+model TransferMessage {
+  id            Int      @id @default(autoincrement())
+  fromFactoryId Int      @map("from_factory_id")
+  fromFactory   Factory  @relation("TransferFrom", fields: [fromFactoryId], references: [id])
+  toFactoryId   Int      @map("to_factory_id")
+  toFactory     Factory  @relation("TransferTo", fields: [toFactoryId], references: [id])
+  targetType    ChangeTargetType @map("target_type")
+  targetId      Int      @map("target_id")
+  targetName    String   @map("target_name")
+  quantity      Int
+  operatorId    Int      @map("operator_id")
+  operator      User     @relation(fields: [operatorId], references: [id])
+  remark        String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("transfer_message")
+}

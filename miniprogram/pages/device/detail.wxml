@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="card head-card">
+    <view class="dev-title">{{deviceName}}</view>
+    <view class="muted">{{factoryName}}</view>
+  </view>
+
+  <view class="card">
+    <view class="row" style="justify-content:space-between; margin-bottom:18rpx;">
+      <view style="font-weight:600;">配件清单</view>
+      <button wx:if="{{isWriter}}" class="btn-primary" size="mini" bindtap="addPart">+ 新增配件</button>
+    </view>
+    <view wx:if="{{!parts.length}}" class="empty">暂无配件</view>
+    <view wx:for="{{parts}}" wx:key="id" class="part-item row">
+      <view class="flex-1">
+        <view style="font-weight:500;">{{item.name}} <text class="muted">{{item.spec || ''}}</text></view>
+        <view class="muted" style="margin-top:4rpx;">单位：{{item.unit}}</view>
+      </view>
+      <view class="qty-num">{{item.quantity}}</view>
+      <view wx:if="{{isWriter}}" class="row qty-actions">
+        <button class="qty-btn minus" catchtap="adjust" data-id="{{item.id}}" data-delta="-1">−</button>
+        <button class="qty-btn plus" catchtap="adjust" data-id="{{item.id}}" data-delta="1">+</button>
+      </view>
+    </view>
+  </view>
+</view>

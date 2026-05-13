@@ -1,0 +1,21 @@
+<view class="container">
+  <view class="card">
+    <view class="form-row">
+      <text class="label">设备名称</text>
+      <input class="value" placeholder="如：注水泵" value="{{name}}" bindinput="onName" />
+    </view>
+    <view class="form-row">
+      <text class="label">规格型号</text>
+      <input class="value" placeholder="如：ZB-200" value="{{spec}}" bindinput="onSpec" />
+    </view>
+    <view class="form-row">
+      <text class="label">单位</text>
+      <input class="value" placeholder="台" value="{{unit}}" bindinput="onUnit" />
+    </view>
+    <view class="form-row">
+      <text class="label">备注</text>
+      <input class="value" placeholder="可选" value="{{remark}}" bindinput="onRemark" />
+    </view>
+    <button class="btn-primary" style="margin-top:30rpx;" bindtap="submit" loading="{{loading}}">保存</button>
+  </view>
+</view>

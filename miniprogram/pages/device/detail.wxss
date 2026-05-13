@@ -1,0 +1,22 @@
+.head-card {
+  background: linear-gradient(135deg, #1890ff, #69c0ff);
+  color: #fff;
+}
+.head-card .muted { color: rgba(255,255,255,0.85); }
+.dev-title { font-size: 38rpx; font-weight: 600; }
+
+.part-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+.part-item:last-child { border-bottom: none; }
+.qty-num { font-size: 36rpx; font-weight: 600; color: #1890ff; min-width: 80rpx; text-align:right; padding-right: 20rpx; }
+.qty-actions { gap: 12rpx; display: flex; }
+.qty-btn {
+  width: 64rpx; padding: 8rpx 0; line-height: 1;
+  border: 1rpx solid #d9d9d9; border-radius: 8rpx;
+  background: #fff; font-size: 32rpx;
+}
+.qty-btn::after { border: none; }
+.qty-btn.minus { color: #fa541c; }
+.qty-btn.plus { color: #52c41a; }

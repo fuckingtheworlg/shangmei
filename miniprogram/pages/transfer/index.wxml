@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="card">
+    <view class="form-row">
+      <text class="label">调出工厂</text>
+      <picker bindchange="onFromChange" range="{{factories}}" range-key="name" value="{{fromIndex}}">
+        <view class="value">{{factories[fromIndex].name || '请选择'}} ›</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="label">调入工厂</text>
+      <picker bindchange="onToChange" range="{{factories}}" range-key="name" value="{{toIndex}}">
+        <view class="value">{{factories[toIndex].name || '请选择'}} ›</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="label">类型</text>
+      <view class="type-tabs">
+        <view class="type-tab {{type === 'DEVICE' ? 'active' : ''}}" bindtap="switchType" data-type="DEVICE">设备</view>
+        <view class="type-tab {{type === 'PART' ? 'active' : ''}}" bindtap="switchType" data-type="PART">配件</view>
+      </view>
+    </view>
+    <view class="form-row">
+      <text class="label">型号</text>
+      <picker bindchange="onTargetChange" range="{{targets}}" range-key="label" value="{{targetIndex}}">
+        <view class="value">{{targets[targetIndex].label || '请选择'}} ›</view>
+      </picker>
+    </view>
+    <view class="form-row">
+      <text class="label">数量</text>
+      <input class="value" type="digit" placeholder="请输入" value="{{quantity}}" bindinput="onQty" />
+    </view>
+    <view class="form-row">
+      <text class="label">备注</text>
+      <input class="value" placeholder="可选" value="{{remark}}" bindinput="onRemark" />
+    </view>
+    <button class="btn-primary" style="margin-top:30rpx;" bindtap="submit" loading="{{loading}}">确认调动</button>
+  </view>
+</view>

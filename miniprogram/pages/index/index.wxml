@@ -1,0 +1,65 @@
+<view class="container">
+  <view class="greet card">
+    <view class="greet-name">你好，{{user.name || '访客'}}</view>
+    <view class="muted">{{user.factoryName}} · {{roleText}}</view>
+  </view>
+
+  <view class="row top-row">
+    <view class="top-card msg" bindtap="goMessage">
+      <view class="top-title">新消息</view>
+      <view class="top-num red">{{unreadCount}}</view>
+      <view class="top-desc">彬渭中心跨厂调动</view>
+    </view>
+    <view class="top-card chg" bindtap="goChange">
+      <view class="top-title">设备变动</view>
+      <view class="top-num green">{{todayChange}}</view>
+      <view class="top-desc">本厂今日变动</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="row" style="justify-content:space-between; margin-bottom:18rpx;">
+      <view style="font-weight:600; font-size:30rpx;">设备数据</view>
+      <view class="muted" bindtap="goDevice">查看详情 ›</view>
+    </view>
+    <view class="row stat-row">
+      <view class="stat-block bg-green" bindtap="goDevice">
+        <view class="stat-label">设备总数</view>
+        <view class="stat-value">{{summary.deviceTotal}}</view>
+      </view>
+      <view class="stat-block bg-blue" bindtap="goDevice">
+        <view class="stat-label">配件总数</view>
+        <view class="stat-value">{{summary.partTotal}}</view>
+      </view>
+    </view>
+    <view class="row stat-row" wx:if="{{isCenter}}">
+      <view class="stat-block bg-orange" bindtap="goTransfer">
+        <view class="stat-label">跨厂调动</view>
+        <view class="stat-value">+</view>
+      </view>
+      <view class="stat-block bg-cyan" bindtap="goNewModel">
+        <view class="stat-label">新建型号</view>
+        <view class="stat-value">+</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view style="font-weight:600; font-size:30rpx; margin-bottom:18rpx;">最近变动</view>
+    <view wx:if="{{!recent.length}}" class="empty">暂无数据</view>
+    <view wx:for="{{recent}}" wx:key="id" class="log-item">
+      <view class="row" style="justify-content:space-between;">
+        <view class="flex-1">
+          <view>
+            <text class="tag {{item.action === 'TRANSFER_IN' ? 'tag-green' : item.action === 'TRANSFER_OUT' ? 'tag-orange' : 'tag-blue'}}">{{item.actionText}}</text>
+            {{' '}}{{item.targetName}}
+          </view>
+          <view class="muted" style="margin-top:6rpx;">{{item.userName}} · {{item.timeText}}</view>
+        </view>
+        <view class="qty {{item.delta > 0 ? 'green' : item.delta < 0 ? 'red' : ''}}">
+          {{item.delta > 0 ? '+' : ''}}{{item.delta}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
