@@ -1,7 +1,8 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 @Controller('message')
 export class MessageController {
@@ -10,8 +11,8 @@ export class MessageController {
   @Get()
   list(
     @CurrentUser() user: UserPayload,
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', new OptionalParseIntPipe()) page?: number,
+    @Query('pageSize', new OptionalParseIntPipe()) pageSize?: number,
   ) {
     return this.service.list(user, page ?? 1, pageSize ?? 20);
   }

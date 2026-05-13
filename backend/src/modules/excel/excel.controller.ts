@@ -17,6 +17,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 @Controller('excel')
 @UseGuards(RolesGuard)
@@ -41,7 +42,7 @@ export class ExcelController {
   async expDevice(
     @CurrentUser() user: UserPayload,
     @Res() res: Response,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
   ) {
     const buf = await this.service.exportDeviceStock(user, factoryId);
     sendXlsx(res, '设备库存.xlsx', buf);
@@ -51,7 +52,7 @@ export class ExcelController {
   async expPart(
     @CurrentUser() user: UserPayload,
     @Res() res: Response,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
   ) {
     const buf = await this.service.exportPartStock(user, factoryId);
     sendXlsx(res, '配件库存.xlsx', buf);

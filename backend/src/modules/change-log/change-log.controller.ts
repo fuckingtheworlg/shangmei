@@ -1,8 +1,9 @@
-import { Controller, Get, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ChangeAction, ChangeTargetType } from '@prisma/client';
 import { ChangeLogService } from './change-log.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 @Controller('change-log')
 export class ChangeLogController {
@@ -11,15 +12,15 @@ export class ChangeLogController {
   @Get()
   list(
     @CurrentUser() user: UserPayload,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
-    @Query('userId', new ParseIntPipe({ optional: true })) userId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
+    @Query('userId', new OptionalParseIntPipe()) userId?: number,
     @Query('targetType') targetType?: ChangeTargetType,
     @Query('action') action?: ChangeAction,
     @Query('keyword') keyword?: string,
     @Query('startTime') startTime?: string,
     @Query('endTime') endTime?: string,
-    @Query('page', new ParseIntPipe({ optional: true })) page?: number,
-    @Query('pageSize', new ParseIntPipe({ optional: true })) pageSize?: number,
+    @Query('page', new OptionalParseIntPipe()) page?: number,
+    @Query('pageSize', new OptionalParseIntPipe()) pageSize?: number,
   ) {
     return this.service.list(user, {
       factoryId,

@@ -17,6 +17,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 class UpsertDeviceDto {
   @IsInt() factoryId!: number;
@@ -43,7 +44,7 @@ export class StockController {
   @Get('summary')
   summary(
     @CurrentUser() user: UserPayload,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
   ) {
     return this.service.summary(user, factoryId);
   }
@@ -51,7 +52,7 @@ export class StockController {
   @Get('devices')
   listDevices(
     @CurrentUser() user: UserPayload,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
     @Query('keyword') keyword?: string,
   ) {
     return this.service.listDevices(user, factoryId, keyword);
@@ -60,8 +61,8 @@ export class StockController {
   @Get('parts')
   listParts(
     @CurrentUser() user: UserPayload,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
-    @Query('deviceModelId', new ParseIntPipe({ optional: true })) deviceModelId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
+    @Query('deviceModelId', new OptionalParseIntPipe()) deviceModelId?: number,
     @Query('keyword') keyword?: string,
   ) {
     return this.service.listParts(user, { factoryId, deviceModelId, keyword });

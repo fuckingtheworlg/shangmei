@@ -14,8 +14,8 @@
       </el-form-item>
       <el-form-item label="类型">
         <el-radio-group v-model="form.targetType" @change="loadTargets">
-          <el-radio-button label="DEVICE">设备</el-radio-button>
-          <el-radio-button label="PART">配件</el-radio-button>
+          <el-radio-button :value="'DEVICE'">设备</el-radio-button>
+          <el-radio-button :value="'PART'">配件</el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="型号">

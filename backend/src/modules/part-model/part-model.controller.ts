@@ -15,6 +15,7 @@ import { UserRole } from '@prisma/client';
 import { PartModelService } from './part-model.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 class CreateDto {
   @IsString() @IsNotEmpty() name!: string;
@@ -39,7 +40,7 @@ export class PartModelController {
   @Get()
   list(
     @Query('keyword') keyword?: string,
-    @Query('deviceModelId', new ParseIntPipe({ optional: true })) deviceModelId?: number,
+    @Query('deviceModelId', new OptionalParseIntPipe()) deviceModelId?: number,
   ) {
     return this.service.list({ keyword, deviceModelId });
   }

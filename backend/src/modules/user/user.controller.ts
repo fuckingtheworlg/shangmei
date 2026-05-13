@@ -25,6 +25,7 @@ import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 class CreateUserDto {
   @IsString() @IsNotEmpty() username!: string;
@@ -56,7 +57,7 @@ export class UserController {
   @Get()
   list(
     @CurrentUser() user: UserPayload,
-    @Query('factoryId', new ParseIntPipe({ optional: true })) factoryId?: number,
+    @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
   ) {
     return this.service.list(user, factoryId);
   }
