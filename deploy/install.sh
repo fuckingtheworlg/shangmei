@@ -64,9 +64,15 @@ ENV
 log "6/7 安装后端依赖（首次约 1-2 分钟，看到 added xxx packages 才算完）"
 cd "$APP_DIR/backend"
 npm install --registry "$NPM_MIRROR"
-log "后端依赖安装完成，开始 Prisma 迁移与构建"
+log "后端依赖安装完成，开始建表与构建"
 npx prisma generate
-npx prisma migrate deploy
+# 仓库里没有 prisma/migrations 时，用 db push 直接同步 schema 到数据库
+if [[ -d prisma/migrations ]] && [[ -n "$(ls -A prisma/migrations 2>/dev/null)" ]]; then
+  npx prisma migrate deploy
+else
+  log "未检测到 prisma/migrations，使用 prisma db push 直接同步 schema"
+  npx prisma db push --skip-generate
+fi
 if [[ "${RUN_SEED:-yes}" == "yes" ]]; then
   npx ts-node prisma/seed.ts || log "seed 跳过（可能已存在数据）"
 fi
