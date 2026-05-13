@@ -14,32 +14,37 @@ NGINX_SERVER_NAME="${NGINX_SERVER_NAME:-_}"   # 公网域名或 _ 表示默认
 API_PORT="${API_PORT:-3000}"
 # ===============================================
 
-log() { echo -e "\033[1;32m[install]\033[0m $*"; }
+log() { echo -e "\033[1;32m[install $(date +%H:%M:%S)]\033[0m $*"; }
 err() { echo -e "\033[1;31m[error]\033[0m $*" >&2; }
 
 [[ $EUID -eq 0 ]] || { err "请用 root 或 sudo 运行"; exit 1; }
 [[ -f "$APP_DIR/backend/package.json" ]] || { err "找不到 $APP_DIR/backend，请先把代码 git clone 到 $APP_DIR"; exit 1; }
 
-log "1/8 更新 apt 并安装基础工具"
-export DEBIAN_FRONTEND=noninteractive
-apt update -qq
-apt install -y -qq curl ca-certificates gnupg lsb-release ufw
+# 国内网络环境：让 npm 走国内镜像（淘宝镜像），避免 install 阻塞
+NPM_MIRROR="${NPM_MIRROR:-https://registry.npmmirror.com}"
+log "配置 npm 镜像：$NPM_MIRROR（如不需要可 export NPM_MIRROR=https://registry.npmjs.org 取消）"
 
-log "2/8 安装 Node.js 20"
+log "1/7 更新 apt 并安装基础工具"
+export DEBIAN_FRONTEND=noninteractive
+apt update
+apt install -y curl ca-certificates gnupg lsb-release ufw
+
+log "2/7 安装 Node.js 20"
 if ! command -v node >/dev/null || ! node -v | grep -q "^v20"; then
   curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-  apt install -y -qq nodejs
+  apt install -y nodejs
 fi
 node -v
-npm install -g pm2 >/dev/null 2>&1 || true
+npm config set registry "$NPM_MIRROR"
 
-log "3/8 安装 MySQL Server"
+log "3/7 安装 MySQL Server（apt 包较大，下载可能需要 1-3 分钟）"
 if ! command -v mysql >/dev/null; then
-  apt install -y -qq mysql-server
+  apt install -y mysql-server
   systemctl enable --now mysql
 fi
+log "MySQL 安装完成，启动状态：$(systemctl is-active mysql)"
 
-log "4/8 创建数据库与账号"
+log "4/7 创建数据库与账号"
 mysql -uroot <<SQL
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` DEFAULT CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';
@@ -48,7 +53,7 @@ GRANT ALL ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 SQL
 
-log "5/8 写入后端 .env"
+log "5/7 写入后端 .env"
 cat > "$APP_DIR/backend/.env" <<ENV
 DATABASE_URL="mysql://${DB_USER}:${DB_PASSWORD}@localhost:3306/${DB_NAME}"
 JWT_SECRET="${JWT_SECRET}"
@@ -56,24 +61,23 @@ JWT_EXPIRES_IN="7d"
 PORT=${API_PORT}
 ENV
 
-log "6/8 安装后端依赖 + 迁移 + 构建"
+log "6/7 安装后端依赖（首次约 1-2 分钟，看到 added xxx packages 才算完）"
 cd "$APP_DIR/backend"
-npm ci --omit=dev || npm install --omit=dev
+npm install --registry "$NPM_MIRROR"
+log "后端依赖安装完成，开始 Prisma 迁移与构建"
 npx prisma generate
 npx prisma migrate deploy
 if [[ "${RUN_SEED:-yes}" == "yes" ]]; then
-  npm install --save-dev ts-node typescript @types/node >/dev/null 2>&1 || true
-  npx ts-node prisma/seed.ts || log "seed 失败可忽略（重复执行）"
+  npx ts-node prisma/seed.ts || log "seed 跳过（可能已存在数据）"
 fi
-npm install --save-dev @nestjs/cli typescript >/dev/null 2>&1 || true
 npm run build
 
-log "7/8 构建 PC 后台"
+log "7/7 构建 PC 后台（约 1-2 分钟）"
 cd "$APP_DIR/admin-web"
-npm ci || npm install
+npm install --registry "$NPM_MIRROR"
 npm run build
 
-log "8/8 安装 systemd + Nginx"
+log "注册 systemd + Nginx"
 install -m 0644 "$APP_DIR/deploy/shangmei-api.service" /etc/systemd/system/shangmei-api.service
 sed -i "s#__APP_DIR__#$APP_DIR#g" /etc/systemd/system/shangmei-api.service
 systemctl daemon-reload

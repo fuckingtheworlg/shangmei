@@ -8,16 +8,17 @@ echo "[update] git pull..."
 git pull --rebase
 
 echo "[update] backend build..."
+NPM_MIRROR="${NPM_MIRROR:-https://registry.npmmirror.com}"
+
 cd "$APP_DIR/backend"
-npm ci --omit=dev || npm install --omit=dev
+npm install --registry "$NPM_MIRROR"
 npx prisma generate
 npx prisma migrate deploy
-npm install --save-dev @nestjs/cli typescript >/dev/null 2>&1 || true
 npm run build
 
 echo "[update] admin-web build..."
 cd "$APP_DIR/admin-web"
-npm ci || npm install
+npm install --registry "$NPM_MIRROR"
 npm run build
 
 echo "[update] restart..."
