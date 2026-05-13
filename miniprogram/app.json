@@ -23,10 +23,10 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/index/index", "text": "首页" },
-      { "pagePath": "pages/device/list", "text": "设备详情" },
-      { "pagePath": "pages/change/index", "text": "变动信息" },
-      { "pagePath": "pages/mine/index", "text": "我的" }
+      { "pagePath": "pages/index/index", "text": "首页", "iconPath": "images/home.png", "selectedIconPath": "images/home.png" },
+      { "pagePath": "pages/device/list", "text": "设备详情", "iconPath": "images/f_device.png", "selectedIconPath": "images/f_device.png" },
+      { "pagePath": "pages/change/index", "text": "变动信息", "iconPath": "images/change.png", "selectedIconPath": "images/change.png" },
+      { "pagePath": "pages/mine/index", "text": "我的", "iconPath": "images/mine.png", "selectedIconPath": "images/mine.png" }
     ]
   },
   "style": "v2",
