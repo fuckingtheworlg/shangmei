@@ -1,3 +1,4 @@
+.container { padding-bottom: 40rpx; }
 .tab-bar {
   display: flex;
   background: #fff;
@@ -5,13 +6,13 @@
 }
 .tab {
   flex: 1; text-align: center; padding: 24rpx 0;
-  color: #888; font-size: 30rpx;
+  color: #888; font-size: 28rpx;
 }
 .tab.active {
   color: #1890ff; font-weight: 600;
   border-bottom: 4rpx solid #1890ff;
 }
-.log-card, .msg-card, .req-card { padding: 24rpx; }
+.req-card { padding: 24rpx; }
 .from-to { font-size: 28rpx; }
 .fac { font-weight: 600; }
 .arrow { color: #1890ff; font-weight: 600; }
@@ -25,14 +26,15 @@
 .status-REJECTED  { background: #fff1f0; color: #f5222d; }
 .status-CANCELLED { background: #fafafa; color: #999; }
 .small { font-size: 22rpx; }
-.badge {
-  display: inline-block;
-  background: #f5222d; color: #fff;
-  padding: 0 10rpx; margin-left: 6rpx;
-  border-radius: 20rpx;
-  font-size: 20rpx; min-width: 24rpx;
+
+.actions {
+  margin-top: 18rpx;
+  display: flex; gap: 16rpx; justify-content: flex-end;
 }
-.qty { font-size: 32rpx; font-weight: 600; }
-.qty.green { color: #52c41a; }
-.qty.red { color: #f5222d; }
-.picker-wrap { padding: 18rpx 24rpx; }
+.btn-approve, .btn-reject {
+  padding: 12rpx 36rpx; line-height: 1;
+  border-radius: 10rpx; font-size: 26rpx;
+}
+.btn-approve::after, .btn-reject::after { border: none; }
+.btn-approve { background: #1890ff; color: #fff; }
+.btn-reject { background: #fff; color: #f5222d; border: 1rpx solid #ffccc7; }

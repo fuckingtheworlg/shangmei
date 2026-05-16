@@ -1,0 +1,35 @@
+<view class="container">
+  <view class="tab-bar">
+    <view wx:for="{{tabs}}" wx:key="key" class="tab {{currentTab === item.key ? 'active' : ''}}" bindtap="switchTab" data-tab="{{item.key}}">
+      {{item.label}}
+    </view>
+  </view>
+
+  <view wx:if="{{!list.length}}" class="empty">暂无申请</view>
+  <view wx:for="{{list}}" wx:key="id" class="card req-card">
+    <view class="row" style="justify-content:space-between;">
+      <view class="from-to">
+        <text class="fac">{{item.fromFactoryName}}</text>
+        <text class="arrow"> → </text>
+        <text class="fac">{{item.toFactoryName}}</text>
+      </view>
+      <view class="status status-{{item.status}}">{{statusText[item.status]}}</view>
+    </view>
+    <view class="muted" style="margin-top:10rpx;">
+      {{item.targetType === 'DEVICE' ? '设备' : '配件'}} · {{item.targetName}} · {{item.quantity}} 件
+    </view>
+    <view class="muted small" style="margin-top:6rpx;">
+      申请人：{{item.applicantName}} · {{formatTime(item.createdAt)}}
+    </view>
+    <view wx:if="{{item.applicantRemark}}" class="muted small">说明：{{item.applicantRemark}}</view>
+    <view wx:if="{{item.reviewerName}}" class="muted small">审批人：{{item.reviewerName}}{{item.reviewRemark ? ' · ' + item.reviewRemark : ''}}</view>
+
+    <view wx:if="{{isCenter && item.status === 'PENDING'}}" class="actions">
+      <button class="btn-reject" catchtap="reject" data-id="{{item.id}}">拒绝</button>
+      <button class="btn-approve" catchtap="approve" data-id="{{item.id}}">通过</button>
+    </view>
+    <view wx:elif="{{item.applicantId === currentUserId && item.status === 'PENDING'}}" class="actions">
+      <button class="btn-reject" catchtap="cancel" data-id="{{item.id}}">取消申请</button>
+    </view>
+  </view>
+</view>

@@ -10,9 +10,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
 import { UserRole } from '@prisma/client';
-import { StockService } from './stock.service';
+import { DeviceStatus, StockService } from './stock.service';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { UserPayload } from '../../common/types/user-payload.type';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -22,7 +22,10 @@ import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe
 class UpsertDeviceDto {
   @IsInt() factoryId!: number;
   @IsInt() deviceModelId!: number;
-  @IsInt() @Min(0) quantity!: number;
+  @IsInt() @Min(0) @IsOptional() qtyInUse?: number;
+  @IsInt() @Min(0) @IsOptional() qtyStandby?: number;
+  @IsInt() @Min(0) @IsOptional() qtyIdle?: number;
+  @IsInt() @Min(0) @IsOptional() qtyStopped?: number;
   @IsString() @IsOptional() remark?: string;
 }
 class UpsertPartDto {
@@ -31,7 +34,12 @@ class UpsertPartDto {
   @IsInt() @Min(0) quantity!: number;
   @IsString() @IsOptional() remark?: string;
 }
-class AdjustDto {
+class AdjustDeviceDto {
+  @IsInt() delta!: number;
+  @IsEnum(['IN_USE', 'STANDBY', 'IDLE', 'STOPPED']) @IsOptional() status?: DeviceStatus;
+  @IsString() @IsOptional() remark?: string;
+}
+class AdjustPartDto {
   @IsInt() delta!: number;
   @IsString() @IsOptional() remark?: string;
 }
@@ -49,13 +57,28 @@ export class StockController {
     return this.service.summary(user, factoryId);
   }
 
+  @Get('by-factory')
+  @Roles(UserRole.SUPER_ADMIN)
+  byFactory(@CurrentUser() user: UserPayload) {
+    return this.service.byFactory(user);
+  }
+
+  @Get('daily-trend')
+  trend(
+    @CurrentUser() user: UserPayload,
+    @Query('days', new OptionalParseIntPipe()) days?: number,
+  ) {
+    return this.service.dailyTrend(user, days ?? 7);
+  }
+
   @Get('devices')
   listDevices(
     @CurrentUser() user: UserPayload,
     @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
+    @Query('categoryId', new OptionalParseIntPipe()) categoryId?: number,
     @Query('keyword') keyword?: string,
   ) {
-    return this.service.listDevices(user, factoryId, keyword);
+    return this.service.listDevices(user, factoryId, keyword, categoryId);
   }
 
   @Get('parts')
@@ -63,9 +86,10 @@ export class StockController {
     @CurrentUser() user: UserPayload,
     @Query('factoryId', new OptionalParseIntPipe()) factoryId?: number,
     @Query('deviceModelId', new OptionalParseIntPipe()) deviceModelId?: number,
+    @Query('categoryId', new OptionalParseIntPipe()) categoryId?: number,
     @Query('keyword') keyword?: string,
   ) {
-    return this.service.listParts(user, { factoryId, deviceModelId, keyword });
+    return this.service.listParts(user, { factoryId, deviceModelId, categoryId, keyword });
   }
 
   @Post('devices')
@@ -85,9 +109,9 @@ export class StockController {
   adjustDevice(
     @CurrentUser() user: UserPayload,
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AdjustDto,
+    @Body() dto: AdjustDeviceDto,
   ) {
-    return this.service.adjustDeviceQty(user, id, dto.delta, dto.remark);
+    return this.service.adjustDeviceQty(user, id, dto.delta, dto.status, dto.remark);
   }
 
   @Patch('parts/:id/adjust')
@@ -95,7 +119,7 @@ export class StockController {
   adjustPart(
     @CurrentUser() user: UserPayload,
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: AdjustDto,
+    @Body() dto: AdjustPartDto,
   ) {
     return this.service.adjustPartQty(user, id, dto.delta, dto.remark);
   }

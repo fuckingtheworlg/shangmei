@@ -1,0 +1,47 @@
+<view class="container">
+  <view class="card head">
+    <view class="dev-title">{{name}} <text class="muted">{{spec}}</text></view>
+    <view class="muted">合计：<text class="total">{{total}}</text></view>
+  </view>
+
+  <view class="card">
+    <view class="b-row">
+      <view class="b-tag in-use">在用</view>
+      <view class="b-actions">
+        <button class="b-btn" data-key="inUse" data-d="-1" bindtap="step">−</button>
+        <input class="b-input" type="digit" value="{{inUse}}" bindinput="onInput" data-key="inUse" />
+        <button class="b-btn" data-key="inUse" data-d="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="b-row">
+      <view class="b-tag standby">备用</view>
+      <view class="b-actions">
+        <button class="b-btn" data-key="standby" data-d="-1" bindtap="step">−</button>
+        <input class="b-input" type="digit" value="{{standby}}" bindinput="onInput" data-key="standby" />
+        <button class="b-btn" data-key="standby" data-d="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="b-row">
+      <view class="b-tag idle">闲置</view>
+      <view class="b-actions">
+        <button class="b-btn" data-key="idle" data-d="-1" bindtap="step">−</button>
+        <input class="b-input" type="digit" value="{{idle}}" bindinput="onInput" data-key="idle" />
+        <button class="b-btn" data-key="idle" data-d="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="b-row">
+      <view class="b-tag stopped">停用</view>
+      <view class="b-actions">
+        <button class="b-btn" data-key="stopped" data-d="-1" bindtap="step">−</button>
+        <input class="b-input" type="digit" value="{{stopped}}" bindinput="onInput" data-key="stopped" />
+        <button class="b-btn" data-key="stopped" data-d="1" bindtap="step">+</button>
+      </view>
+    </view>
+    <view class="b-row">
+      <view class="b-tag" style="background:#fafafa;color:#666;">备注</view>
+      <input class="remark" placeholder="可选" value="{{remark}}" bindinput="onRemark" />
+    </view>
+  </view>
+
+  <button class="btn-primary" style="margin:30rpx 20rpx;" bindtap="save" loading="{{saving}}">保存</button>
+</view>

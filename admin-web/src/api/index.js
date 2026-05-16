@@ -36,6 +36,8 @@ export const partModelApi = {
 
 export const stockApi = {
   summary: (params) => req.get('/stock/summary', { params }),
+  byFactory: () => req.get('/stock/by-factory'),
+  dailyTrend: (days) => req.get('/stock/daily-trend', { params: { days } }),
   devices: (params) => req.get('/stock/devices', { params }),
   parts: (params) => req.get('/stock/parts', { params }),
   upsertDevice: (data) => req.post('/stock/devices', data),
@@ -44,6 +46,22 @@ export const stockApi = {
   adjustPart: (id, data) => req.patch(`/stock/parts/${id}/adjust`, data),
   removeDevice: (id) => req.delete(`/stock/devices/${id}`),
   removePart: (id) => req.delete(`/stock/parts/${id}`)
+};
+
+export const categoryApi = {
+  list: () => req.get('/category'),
+  create: (data) => req.post('/category', data),
+  update: (id, data) => req.patch(`/category/${id}`, data),
+  remove: (id) => req.delete(`/category/${id}`)
+};
+
+export const transferRequestApi = {
+  list: (params) => req.get('/transfer-request', { params }),
+  pendingCount: () => req.get('/transfer-request/pending-count'),
+  create: (data) => req.post('/transfer-request', data),
+  approve: (id, data) => req.post(`/transfer-request/${id}/approve`, data),
+  reject: (id, data) => req.post(`/transfer-request/${id}/reject`, data),
+  cancel: (id) => req.post(`/transfer-request/${id}/cancel`, {})
 };
 
 export const changeLogApi = {

@@ -1,3 +1,14 @@
+.info-card {
+  background: linear-gradient(135deg, #1890ff, #4dabff);
+  color: #fff;
+  margin: 20rpx;
+  padding: 30rpx 24rpx;
+  border-radius: 16rpx;
+}
+.info-title { font-size: 32rpx; font-weight: 600; }
+.info-sub { font-size: 24rpx; opacity: 0.9; margin-top: 8rpx; }
+.arrow { color: #ccc; }
+
 .form-row {
   display: flex; align-items: center;
   padding: 24rpx 0; border-bottom: 1rpx solid #f0f0f0;

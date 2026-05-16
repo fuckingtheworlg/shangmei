@@ -1,64 +1,111 @@
-<view class="container">
-  <view class="greet card">
-    <view class="greet-name">你好，{{user.name || '访客'}}</view>
-    <view class="muted">{{user.factoryName}} · {{roleText}}</view>
-  </view>
-
-  <view class="row top-row">
-    <view class="top-card msg" bindtap="goMessage">
-      <view class="top-title">新消息</view>
-      <view class="top-num red">{{unreadCount}}</view>
-      <view class="top-desc">彬渭中心跨厂调动</view>
-    </view>
-    <view class="top-card chg" bindtap="goChange">
-      <view class="top-title">设备变动</view>
-      <view class="top-num green">{{todayChange}}</view>
-      <view class="top-desc">本厂今日变动</view>
-    </view>
-  </view>
-
-  <view class="card">
-    <view class="row" style="justify-content:space-between; margin-bottom:18rpx;">
-      <view style="font-weight:600; font-size:30rpx;">设备数据</view>
-      <view class="muted" bindtap="goDevice">查看详情 ›</view>
-    </view>
-    <view class="row stat-row">
-      <view class="stat-block bg-green" bindtap="goDevice">
-        <view class="stat-label">设备总数</view>
-        <view class="stat-value">{{summary.deviceTotal}}</view>
-      </view>
-      <view class="stat-block bg-blue" bindtap="goDevice">
-        <view class="stat-label">配件总数</view>
-        <view class="stat-value">{{summary.partTotal}}</view>
-      </view>
-    </view>
-    <view class="row stat-row" wx:if="{{isCenter}}">
-      <view class="stat-block bg-orange" bindtap="goTransfer">
-        <view class="stat-label">跨厂调动</view>
-        <view class="stat-value">+</view>
-      </view>
-      <view class="stat-block bg-cyan" bindtap="goNewModel">
-        <view class="stat-label">新建型号</view>
-        <view class="stat-value">+</view>
-      </view>
-    </view>
-  </view>
-
-  <view class="card">
-    <view style="font-weight:600; font-size:30rpx; margin-bottom:18rpx;">最近变动</view>
-    <view wx:if="{{!recent.length}}" class="empty">暂无数据</view>
-    <view wx:for="{{recent}}" wx:key="id" class="log-item">
-      <view class="row" style="justify-content:space-between;">
-        <view class="flex-1">
-          <view>
-            <text class="tag {{item.action === 'TRANSFER_IN' ? 'tag-green' : item.action === 'TRANSFER_OUT' ? 'tag-orange' : 'tag-blue'}}">{{item.actionText}}</text>
-            {{' '}}{{item.targetName}}
-          </view>
-          <view class="muted" style="margin-top:6rpx;">{{item.userName}} · {{item.timeText}}</view>
+<view class="page">
+  <!-- Hero Banner -->
+  <view class="hero">
+    <view class="hero-bg"></view>
+    <view class="hero-content">
+      <view class="hero-greet">
+        <view class="greet-text">
+          <view class="greet-hello">{{greeting}}，{{user.name || ''}}</view>
+          <view class="greet-sub">{{user.factoryName}} · {{roleText}}</view>
         </view>
-        <view class="qty {{item.delta > 0 ? 'green' : item.delta < 0 ? 'red' : ''}}">
-          {{item.delta > 0 ? '+' : ''}}{{item.delta}}
+        <view class="hero-clock">
+          <view class="clock-time">{{clockTime}}</view>
+          <view class="clock-date">{{clockDate}}</view>
         </view>
+      </view>
+
+      <!-- 两个大卡片 -->
+      <view class="top-row">
+        <view class="top-card msg" bindtap="goMessage">
+          <view class="top-num red">{{unreadCount}}</view>
+          <view class="top-title">新消息</view>
+          <view class="top-desc">跨厂调动</view>
+        </view>
+        <view class="top-card chg" bindtap="goChange">
+          <view class="top-num green">{{todayChange}}</view>
+          <view class="top-title">设备变动</view>
+          <view class="top-desc">本厂今日</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据胶囊 -->
+  <view class="capsule-row">
+    <view class="capsule cap-blue" bindtap="goDevice">
+      <view class="cap-label">设备总数</view>
+      <view class="cap-value">{{summary.deviceTotal}}</view>
+    </view>
+    <view class="capsule cap-green" bindtap="goDevice">
+      <view class="cap-label">配件总数</view>
+      <view class="cap-value">{{summary.partTotal}}</view>
+    </view>
+    <view class="capsule cap-orange" bindtap="goPending">
+      <view class="cap-label">待审批</view>
+      <view class="cap-value">{{pendingCount}}</view>
+    </view>
+  </view>
+
+  <!-- 设备状态分布 -->
+  <view class="card status-card">
+    <view class="card-head">
+      <view class="card-title">设备状态分布</view>
+      <view class="card-sub">{{statusTotal}} 台</view>
+    </view>
+    <view wx:if="{{statusTotal === 0}}" class="empty">暂无数据</view>
+    <view wx:else>
+      <view class="status-bar">
+        <view class="seg in-use" style="width:{{statusPct.inUse}}%"></view>
+        <view class="seg standby" style="width:{{statusPct.standby}}%"></view>
+        <view class="seg idle" style="width:{{statusPct.idle}}%"></view>
+        <view class="seg stopped" style="width:{{statusPct.stopped}}%"></view>
+      </view>
+      <view class="status-grid">
+        <view class="st-item">
+          <view class="st-dot in-use"></view>
+          <view class="st-text">在用 <text class="st-val">{{status.inUse}}</text></view>
+        </view>
+        <view class="st-item">
+          <view class="st-dot standby"></view>
+          <view class="st-text">备用 <text class="st-val">{{status.standby}}</text></view>
+        </view>
+        <view class="st-item">
+          <view class="st-dot idle"></view>
+          <view class="st-text">闲置 <text class="st-val">{{status.idle}}</text></view>
+        </view>
+        <view class="st-item">
+          <view class="st-dot stopped"></view>
+          <view class="st-text">停用 <text class="st-val">{{status.stopped}}</text></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="card">
+    <view class="card-head">
+      <view class="card-title">快捷操作</view>
+    </view>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goDevice">
+        <view class="quick-icon q-blue">设</view>
+        <view class="quick-label">设备库存</view>
+      </view>
+      <view class="quick-item" bindtap="goTransfer">
+        <view class="quick-icon q-orange">调</view>
+        <view class="quick-label">提交调动</view>
+      </view>
+      <view class="quick-item" bindtap="goChange">
+        <view class="quick-icon q-green">日</view>
+        <view class="quick-label">变动日志</view>
+      </view>
+      <view class="quick-item" wx:if="{{isCenter}}" bindtap="goNewDevice">
+        <view class="quick-icon q-purple">+</view>
+        <view class="quick-label">新建型号</view>
+      </view>
+      <view class="quick-item" wx:if="{{!isCenter}}" bindtap="goNewPart">
+        <view class="quick-icon q-purple">+</view>
+        <view class="quick-label">新建配件</view>
       </view>
     </view>
   </view>

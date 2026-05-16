@@ -10,6 +10,14 @@ const ACTION_TEXT = {
   IMPORT: '导入'
 };
 
+const STATUS_TEXT = {
+  PENDING: '待审批',
+  APPROVED: '已通过',
+  COMPLETED: '已完成',
+  REJECTED: '已拒绝',
+  CANCELLED: '已取消'
+};
+
 function formatTime(s) {
   const d = new Date(s);
   const pad = (n) => (n < 10 ? '0' + n : '' + n);
@@ -25,7 +33,10 @@ Page({
     factoryIndex: 0,
     currentFactory: null,
     logs: [],
-    messages: []
+    messages: [],
+    requests: [],
+    pendingBadge: 0,
+    statusText: STATUS_TEXT
   },
   async onShow() {
     if (!auth.ensureLogin()) return;
@@ -52,8 +63,21 @@ Page({
     this.setData({ factoryIndex: idx, currentFactory: fac }, () => this.loadCurrent());
   },
   loadCurrent() {
-    return this.data.tab === 'change' ? this.loadLogs() : this.loadMessages();
+    // 顺便刷一下右上角徽标
+    req.get('/transfer-request/pending-count').then((r) => this.setData({ pendingBadge: r.count })).catch(() => {});
+    if (this.data.tab === 'change') return this.loadLogs();
+    if (this.data.tab === 'message') return this.loadMessages();
+    return this.loadRequests();
   },
+  async loadRequests() {
+    try {
+      const res = await req.get('/transfer-request', { pageSize: 50 });
+      this.setData({
+        requests: res.rows.map((r) => ({ ...r, timeText: formatTime(r.createdAt) }))
+      });
+    } catch (e) {}
+  },
+  goRequestPage() { wx.navigateTo({ url: '/pages/transfer/list' }); },
   async loadLogs() {
     const params = { pageSize: 30 };
     if (this.data.isCenter && this.data.currentFactory && this.data.currentFactory.id) {

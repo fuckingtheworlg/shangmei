@@ -1,36 +1,52 @@
 <view class="container">
-  <view class="filter-bar">
-    <view wx:if="{{isCenter}}" class="picker-wrap card" style="margin:20rpx;">
-      <picker bindchange="onFactoryChange" range="{{factories}}" range-key="name" value="{{factoryIndex}}">
-        <view class="row" style="justify-content:space-between;">
-          <text class="muted">查看工厂</text>
-          <text>{{currentFactory.name || '全部'}} ›</text>
-        </view>
-      </picker>
-    </view>
-    <view class="search-wrap card" style="margin:20rpx;">
-      <input
-        class="search-input"
-        placeholder="搜索设备名称/规格"
-        value="{{keyword}}"
-        bindinput="onKeyword"
-        bindconfirm="loadList"
-      />
-    </view>
+  <view wx:if="{{isCenter}}" class="picker-wrap card" style="margin:20rpx;">
+    <picker bindchange="onFactoryChange" range="{{factories}}" range-key="name" value="{{factoryIndex}}">
+      <view class="row" style="justify-content:space-between;">
+        <text class="muted">查看工厂</text>
+        <text>{{currentFactory.name || '全部'}} ›</text>
+      </view>
+    </picker>
   </view>
 
+  <view class="search-wrap card" style="margin:20rpx;">
+    <input
+      class="search-input"
+      placeholder="搜索设备名称/规格"
+      value="{{keyword}}"
+      bindinput="onKeyword"
+      bindconfirm="loadList"
+    />
+  </view>
+
+  <!-- 分类 Chip -->
+  <scroll-view class="cat-scroll" scroll-x="true" enable-flex="true">
+    <view class="cat-row">
+      <view class="cat-chip {{!currentCategory ? 'on' : ''}}" bindtap="selectCategory" data-id="">全部</view>
+      <view
+        wx:for="{{categories}}"
+        wx:key="id"
+        class="cat-chip {{currentCategory === item.id ? 'on' : ''}}"
+        bindtap="selectCategory"
+        data-id="{{item.id}}"
+      >{{item.name}}</view>
+    </view>
+  </scroll-view>
+
   <view wx:if="{{isWriter}}" class="card add-bar">
-    <button class="btn-primary" size="mini" bindtap="goAddStock">+ 新增设备库存</button>
+    <button class="btn-primary" size="mini" bindtap="goAddStock">+ 新增配件库存</button>
   </view>
 
   <view wx:if="{{!list.length}}" class="empty">暂无数据</view>
   <view wx:for="{{list}}" wx:key="id" class="card device-card" bindtap="goDetail" data-id="{{item.deviceModelId}}" data-stockid="{{item.id}}" data-factoryid="{{item.factoryId}}">
     <view class="row" style="justify-content:space-between;">
       <view class="flex-1">
-        <view class="dev-name">{{item.name}} <text class="muted">{{item.spec || ''}}</text></view>
-        <view class="muted" style="margin-top:6rpx;">
-          <text wx:if="{{isCenter}}">{{item.factoryName}} · </text>
-          单位：{{item.unit}}
+        <view class="dev-name">
+          <text>{{item.name}}</text>
+          <text class="muted">{{item.spec || ''}}</text>
+        </view>
+        <view class="dev-meta" style="margin-top:6rpx;">
+          <view wx:if="{{item.categoryName}}" class="tag tag-cat">{{item.categoryName}}</view>
+          <text wx:if="{{isCenter}}" class="muted small">{{item.factoryName}}</text>
         </view>
       </view>
       <view class="qty-block">
@@ -38,10 +54,28 @@
         <view class="muted" style="text-align:center;">{{item.unit}}</view>
       </view>
     </view>
+
+    <view class="buckets" catchtap="noop">
+      <view class="b-cell">
+        <view class="b-tag in-use">在用</view>
+        <view class="b-val">{{item.qtyInUse}}</view>
+      </view>
+      <view class="b-cell">
+        <view class="b-tag standby">备用</view>
+        <view class="b-val">{{item.qtyStandby}}</view>
+      </view>
+      <view class="b-cell">
+        <view class="b-tag idle">闲置</view>
+        <view class="b-val">{{item.qtyIdle}}</view>
+      </view>
+      <view class="b-cell">
+        <view class="b-tag stopped">停用</view>
+        <view class="b-val">{{item.qtyStopped}}</view>
+      </view>
+    </view>
+
     <view wx:if="{{isWriter}}" class="row qty-actions" catchtap="noop">
-      <button class="qty-btn minus" catchtap="adjust" data-id="{{item.id}}" data-delta="-1">−</button>
-      <button class="qty-btn plus" catchtap="adjust" data-id="{{item.id}}" data-delta="1">+</button>
-      <button class="qty-btn edit" catchtap="editStock" data-item="{{item}}">改</button>
+      <button class="qty-btn edit" catchtap="editStock" data-item="{{item}}">分桶编辑</button>
     </view>
   </view>
 </view>

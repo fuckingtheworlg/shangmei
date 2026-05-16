@@ -9,6 +9,8 @@ Page({
     factories: [],
     factoryIndex: 0,
     currentFactory: null,
+    categories: [],
+    currentCategory: null,
     keyword: '',
     list: []
   },
@@ -27,6 +29,12 @@ Page({
         this.setData({ factories: list, factoryIndex: 0, currentFactory: list[0] });
       } catch (e) {}
     }
+    if (this.data.categories.length === 0) {
+      try {
+        const cats = await req.get('/category');
+        this.setData({ categories: cats });
+      } catch (e) {}
+    }
     this.loadList();
   },
   onPullDownRefresh() {
@@ -38,48 +46,25 @@ Page({
     const fac = this.data.factories[idx];
     this.setData({ factoryIndex: idx, currentFactory: fac }, () => this.loadList());
   },
+  selectCategory(e) {
+    const v = e.currentTarget.dataset.id;
+    this.setData({ currentCategory: v ? Number(v) : null }, () => this.loadList());
+  },
   async loadList() {
     const params = { keyword: this.data.keyword || undefined };
     if (this.data.isCenter && this.data.currentFactory && this.data.currentFactory.id) {
       params.factoryId = this.data.currentFactory.id;
     }
+    if (this.data.currentCategory) params.categoryId = this.data.currentCategory;
     try {
       const list = await req.get('/stock/devices', params);
       this.setData({ list });
     } catch (e) {}
   },
-  async adjust(e) {
-    const id = e.currentTarget.dataset.id;
-    const delta = Number(e.currentTarget.dataset.delta);
-    try {
-      await req.patch(`/stock/devices/${id}/adjust`, { delta });
-      wx.showToast({ title: '已更新', icon: 'success' });
-      this.loadList();
-    } catch (e) {}
-  },
   editStock(e) {
     const item = e.currentTarget.dataset.item;
-    wx.showModal({
-      title: '修改数量',
-      editable: true,
-      placeholderText: String(item.quantity),
-      success: async (res) => {
-        if (!res.confirm) return;
-        const v = Number(res.content);
-        if (!Number.isFinite(v) || v < 0) {
-          wx.showToast({ title: '请输入合法数量', icon: 'none' });
-          return;
-        }
-        try {
-          await req.post('/stock/devices', {
-            factoryId: item.factoryId,
-            deviceModelId: item.deviceModelId,
-            quantity: v
-          });
-          wx.showToast({ title: '已保存', icon: 'success' });
-          this.loadList();
-        } catch (e) {}
-      }
+    wx.navigateTo({
+      url: `/pages/device/edit?stockId=${item.id}&inUse=${item.qtyInUse}&standby=${item.qtyStandby}&idle=${item.qtyIdle}&stopped=${item.qtyStopped}&factoryId=${item.factoryId}&deviceModelId=${item.deviceModelId}&name=${encodeURIComponent(item.name)}&spec=${encodeURIComponent(item.spec || '')}`
     });
   },
   goDetail(e) {
@@ -87,7 +72,7 @@ Page({
     wx.navigateTo({ url: `/pages/device/detail?deviceModelId=${id}&factoryId=${factoryid}` });
   },
   goAddStock() {
-    wx.navigateTo({ url: '/pages/model/part-form?mode=stock' });
+    wx.navigateTo({ url: '/pages/model/part-form' });
   },
   noop() {}
 });

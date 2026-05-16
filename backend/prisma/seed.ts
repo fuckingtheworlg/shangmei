@@ -64,19 +64,55 @@ async function main() {
     },
   });
 
+  // ---- 设备大分类 ----
+  const categories = [
+    { name: '皮带机', sortOrder: 1 },
+    { name: '水泵', sortOrder: 2 },
+    { name: '电机', sortOrder: 3 },
+    { name: '压缩机', sortOrder: 4 },
+    { name: '配电柜', sortOrder: 5 },
+  ];
+  const catRows: Record<string, number> = {};
+  for (const c of categories) {
+    const row = await prisma.deviceCategory.upsert({
+      where: { name: c.name },
+      update: { sortOrder: c.sortOrder },
+      create: c,
+    });
+    catRows[c.name] = row.id;
+  }
+
   const devices = [
-    { name: '注水泵', spec: 'ZB-200', unit: '台' },
-    { name: '抽油机', spec: 'CYJ-10', unit: '台' },
-    { name: '压缩机', spec: 'YSJ-100', unit: '台' },
+    { name: '注水泵', spec: 'ZB-200', unit: '台', category: '水泵' },
+    { name: '抽油机', spec: 'CYJ-10', unit: '台', category: '电机' },
+    { name: '压缩机', spec: 'YSJ-100', unit: '台', category: '压缩机' },
   ];
   const deviceRows = [] as { id: number; name: string }[];
   for (const d of devices) {
     const row = await prisma.deviceModel.upsert({
       where: { name_spec: { name: d.name, spec: d.spec } },
-      update: {},
-      create: d,
+      update: { categoryId: catRows[d.category] },
+      create: {
+        name: d.name,
+        spec: d.spec,
+        unit: d.unit,
+        categoryId: catRows[d.category],
+      },
     });
     deviceRows.push({ id: row.id, name: row.name });
+  }
+
+  // ---- 迁移：把现有 quantity（如果有）灌进 qtyInUse ----
+  const allDeviceStocks = await prisma.factoryDeviceStock.findMany({
+    where: { qtyInUse: 0, qtyStandby: 0, qtyIdle: 0, qtyStopped: 0 },
+  });
+  for (const s of allDeviceStocks) {
+    if (s.quantity > 0) {
+      await prisma.factoryDeviceStock.update({
+        where: { id: s.id },
+        data: { qtyInUse: s.quantity },
+      });
+    }
   }
 
   const parts = [
@@ -100,6 +136,10 @@ async function main() {
 
   for (const factory of factoryRows) {
     for (const device of deviceRows) {
+      const inUse = Math.floor(Math.random() * 15) + 3;
+      const standby = Math.floor(Math.random() * 5);
+      const idle = Math.floor(Math.random() * 3);
+      const stopped = Math.floor(Math.random() * 2);
       await prisma.factoryDeviceStock.upsert({
         where: {
           factoryId_deviceModelId: {
@@ -111,7 +151,11 @@ async function main() {
         create: {
           factoryId: factory.id,
           deviceModelId: device.id,
-          quantity: Math.floor(Math.random() * 20) + 5,
+          qtyInUse: inUse,
+          qtyStandby: standby,
+          qtyIdle: idle,
+          qtyStopped: stopped,
+          quantity: inUse + standby + idle + stopped,
         },
       });
     }

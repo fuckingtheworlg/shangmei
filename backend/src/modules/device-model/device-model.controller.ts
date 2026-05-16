@@ -10,22 +10,25 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { UserRole } from '@prisma/client';
 import { DeviceModelService } from './device-model.service';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { OptionalParseIntPipe } from '../../common/pipes/optional-parse-int.pipe';
 
 class CreateDto {
   @IsString() @IsNotEmpty() name!: string;
   @IsString() @IsOptional() spec?: string;
   @IsString() @IsOptional() unit?: string;
+  @IsInt() @IsOptional() categoryId?: number;
   @IsString() @IsOptional() remark?: string;
 }
 class UpdateDto {
   @IsString() @IsOptional() name?: string;
   @IsString() @IsOptional() spec?: string;
   @IsString() @IsOptional() unit?: string;
+  @IsInt() @IsOptional() categoryId?: number;
   @IsString() @IsOptional() remark?: string;
 }
 
@@ -35,8 +38,11 @@ export class DeviceModelController {
   constructor(private service: DeviceModelService) {}
 
   @Get()
-  list(@Query('keyword') keyword?: string) {
-    return this.service.list(keyword);
+  list(
+    @Query('keyword') keyword?: string,
+    @Query('categoryId', new OptionalParseIntPipe()) categoryId?: number,
+  ) {
+    return this.service.list({ keyword, categoryId });
   }
 
   @Post()

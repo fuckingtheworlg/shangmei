@@ -21,13 +21,20 @@ export class ExcelService {
     const ws = wb.addWorksheet('设备库存');
     ws.columns = [
       { header: '厂名称', key: 'factory', width: 18 },
+      { header: '设备分类', key: 'category', width: 14 },
       { header: '设备型号', key: 'name', width: 18 },
       { header: '规格', key: 'spec', width: 18 },
       { header: '单位', key: 'unit', width: 8 },
-      { header: '数量', key: 'qty', width: 10 },
+      { header: '在用', key: 'inUse', width: 10 },
+      { header: '备用', key: 'standby', width: 10 },
+      { header: '闲置', key: 'idle', width: 10 },
+      { header: '停用', key: 'stopped', width: 10 },
       { header: '备注', key: 'remark', width: 24 },
     ];
-    ws.addRow({ factory: '第一分厂', name: '注水泵', spec: 'ZB-200', unit: '台', qty: 5, remark: '' });
+    ws.addRow({
+      factory: '第一分厂', category: '水泵', name: '注水泵', spec: 'ZB-200',
+      unit: '台', inUse: 5, standby: 2, idle: 1, stopped: 0, remark: '',
+    });
     return Buffer.from(await wb.xlsx.writeBuffer());
   }
 
@@ -60,26 +67,36 @@ export class ExcelService {
     const where = factoryId ? { factoryId } : current.role === 'SUPER_ADMIN' ? {} : { factoryId: current.factoryId };
     const rows = await this.prisma.factoryDeviceStock.findMany({
       where,
-      include: { factory: true, deviceModel: true },
+      include: { factory: true, deviceModel: { include: { category: true } } },
       orderBy: [{ factoryId: 'asc' }, { deviceModelId: 'asc' }],
     });
     const wb = new ExcelJS.Workbook();
     const ws = wb.addWorksheet('设备库存');
     ws.columns = [
       { header: '厂名称', key: 'factory', width: 18 },
+      { header: '设备分类', key: 'category', width: 14 },
       { header: '设备型号', key: 'name', width: 18 },
       { header: '规格', key: 'spec', width: 18 },
       { header: '单位', key: 'unit', width: 8 },
-      { header: '数量', key: 'qty', width: 10 },
+      { header: '在用', key: 'inUse', width: 10 },
+      { header: '备用', key: 'standby', width: 10 },
+      { header: '闲置', key: 'idle', width: 10 },
+      { header: '停用', key: 'stopped', width: 10 },
+      { header: '总数', key: 'total', width: 10 },
       { header: '备注', key: 'remark', width: 24 },
     ];
     for (const r of rows) {
       ws.addRow({
         factory: r.factory.name,
+        category: r.deviceModel.category?.name ?? '',
         name: r.deviceModel.name,
         spec: r.deviceModel.spec,
         unit: r.deviceModel.unit,
-        qty: r.quantity,
+        inUse: r.qtyInUse,
+        standby: r.qtyStandby,
+        idle: r.qtyIdle,
+        stopped: r.qtyStopped,
+        total: r.quantity,
         remark: r.remark,
       });
     }
@@ -131,15 +148,21 @@ export class ExcelService {
       result.total += 1;
       try {
         const factoryName = String(row.getCell(1).value ?? '').trim();
-        const name = String(row.getCell(2).value ?? '').trim();
-        const spec = String(row.getCell(3).value ?? '').trim() || null;
-        const unit = String(row.getCell(4).value ?? '台').trim() || '台';
-        const qtyRaw = row.getCell(5).value;
-        const remark = String(row.getCell(6).value ?? '').trim() || null;
-        const qty = Number(qtyRaw);
+        const categoryName = String(row.getCell(2).value ?? '').trim();
+        const name = String(row.getCell(3).value ?? '').trim();
+        const spec = String(row.getCell(4).value ?? '').trim() || null;
+        const unit = String(row.getCell(5).value ?? '台').trim() || '台';
+        const inUse = Number(row.getCell(6).value ?? 0);
+        const standby = Number(row.getCell(7).value ?? 0);
+        const idle = Number(row.getCell(8).value ?? 0);
+        const stopped = Number(row.getCell(9).value ?? 0);
+        const remark = String(row.getCell(10).value ?? '').trim() || null;
         if (!factoryName) throw new Error('厂名称为空');
         if (!name) throw new Error('设备型号为空');
-        if (!Number.isFinite(qty) || qty < 0) throw new Error('数量非法');
+        for (const [k, v] of [['在用', inUse], ['备用', standby], ['闲置', idle], ['停用', stopped]] as const) {
+          if (!Number.isFinite(v as number) || (v as number) < 0) throw new Error(`${k} 数量非法`);
+        }
+        const total = inUse + standby + idle + stopped;
 
         const factory = await this.prisma.factory.upsert({
           where: { name: factoryName },
@@ -147,12 +170,24 @@ export class ExcelService {
           create: { name: factoryName },
         });
 
-        // 复合 unique 含 nullable 字段（spec），不能用 upsert/findUnique，改用 findFirst
+        let categoryId: number | null = null;
+        if (categoryName) {
+          const cat = await this.prisma.deviceCategory.upsert({
+            where: { name: categoryName },
+            update: {},
+            create: { name: categoryName },
+          });
+          categoryId = cat.id;
+        }
+
         let device = await this.prisma.deviceModel.findFirst({ where: { name, spec } });
         if (!device) {
-          device = await this.prisma.deviceModel.create({ data: { name, spec, unit } });
-        } else if (device.unit !== unit) {
-          device = await this.prisma.deviceModel.update({ where: { id: device.id }, data: { unit } });
+          device = await this.prisma.deviceModel.create({ data: { name, spec, unit, categoryId } });
+        } else {
+          device = await this.prisma.deviceModel.update({
+            where: { id: device.id },
+            data: { unit, categoryId: categoryId ?? device.categoryId },
+          });
         }
 
         const existing = await this.prisma.factoryDeviceStock.findUnique({
@@ -163,8 +198,12 @@ export class ExcelService {
           where: {
             factoryId_deviceModelId: { factoryId: factory.id, deviceModelId: device.id },
           },
-          update: { quantity: qty, remark },
-          create: { factoryId: factory.id, deviceModelId: device.id, quantity: qty, remark },
+          update: { qtyInUse: inUse, qtyStandby: standby, qtyIdle: idle, qtyStopped: stopped, quantity: total, remark },
+          create: {
+            factoryId: factory.id, deviceModelId: device.id,
+            qtyInUse: inUse, qtyStandby: standby, qtyIdle: idle, qtyStopped: stopped,
+            quantity: total, remark,
+          },
         });
         await this.prisma.changeLog.create({
           data: {
@@ -174,8 +213,8 @@ export class ExcelService {
             targetId: device.id,
             targetName: `${device.name}${device.spec ? ' / ' + device.spec : ''}`,
             beforeQty,
-            afterQty: qty,
-            delta: qty - beforeQty,
+            afterQty: total,
+            delta: total - beforeQty,
             action: ChangeAction.IMPORT,
             remark: 'Excel 导入',
           },

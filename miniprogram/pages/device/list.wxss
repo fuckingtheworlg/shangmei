@@ -1,27 +1,61 @@
 .container { padding-bottom: 40rpx; }
-.filter-bar { display: block; }
 .search-input { padding: 12rpx 0; }
 .add-bar { display:flex; justify-content:flex-end; }
-.add-bar .btn-primary { width: 240rpx; }
+.add-bar .btn-primary { width: 280rpx; }
+
+.cat-scroll { white-space: nowrap; padding: 0 20rpx 12rpx; }
+.cat-row { display: inline-flex; gap: 12rpx; }
+.cat-chip {
+  padding: 12rpx 26rpx;
+  background: #fff;
+  border-radius: 24rpx;
+  font-size: 26rpx;
+  color: #555;
+  border: 1rpx solid #e8e8e8;
+}
+.cat-chip.on {
+  background: #1890ff;
+  color: #fff;
+  border-color: #1890ff;
+}
 
 .device-card { padding: 24rpx; }
 .dev-name { font-size: 32rpx; font-weight: 600; }
-.qty-block { padding-left: 20rpx; }
+.dev-meta { display: flex; align-items: center; gap: 12rpx; }
+.tag-cat { background:#e6f7ff; color:#1890ff; padding:4rpx 14rpx; border-radius:14rpx; font-size:22rpx; }
+.small { font-size: 22rpx; }
+
+.qty-block { padding-left: 20rpx; min-width: 110rpx; }
 .qty-num { font-size: 44rpx; font-weight: 700; color: #1890ff; text-align: center; }
 
-.qty-actions { margin-top: 18rpx; gap: 16rpx; display: flex; }
+.buckets {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12rpx; margin: 18rpx 0;
+  padding: 16rpx; background: #fafafa; border-radius: 12rpx;
+}
+.b-cell { text-align: center; }
+.b-tag {
+  display: inline-block;
+  padding: 2rpx 14rpx; border-radius: 12rpx;
+  font-size: 20rpx; font-weight: 600;
+}
+.b-tag.in-use   { background:#e6f7ff; color:#1890ff; }
+.b-tag.standby  { background:#f6ffed; color:#52c41a; }
+.b-tag.idle     { background:#fff7e6; color:#fa8c16; }
+.b-tag.stopped  { background:#f9f0ff; color:#722ed1; }
+.b-val { font-size: 28rpx; font-weight: 600; color: #333; margin-top: 6rpx; }
+
+.qty-actions { gap: 16rpx; display: flex; }
 .qty-btn {
   flex: 1;
   border: 1rpx solid #d9d9d9;
   background: #fff;
   border-radius: 10rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   padding: 12rpx 0;
   line-height: 1.2;
 }
 .qty-btn::after { border: none; }
-.qty-btn.minus { color: #fa541c; }
-.qty-btn.plus { color: #52c41a; }
 .qty-btn.edit { color: #1890ff; }
 
 .picker-wrap { padding: 18rpx 24rpx; }

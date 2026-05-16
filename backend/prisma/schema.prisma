@@ -23,6 +23,8 @@ model Factory {
   changeLogs     ChangeLog[]
   transfersFrom  TransferMessage[] @relation("TransferFrom")
   transfersTo    TransferMessage[] @relation("TransferTo")
+  requestsFrom   TransferRequest[] @relation("RequestFrom")
+  requestsTo     TransferRequest[] @relation("RequestTo")
 
   @@map("factory")
 }
@@ -49,24 +51,44 @@ model User {
 
   changeLogs    ChangeLog[]
   transfers     TransferMessage[]
+  requestsApplied  TransferRequest[] @relation("RequestApplicant")
+  requestsReviewed TransferRequest[] @relation("RequestReviewer")
 
   @@map("user")
 }
 
-// 设备型号字典
-model DeviceModel {
+// 设备大分类（皮带机/水泵/电机/压缩机 等）
+model DeviceCategory {
   id        Int      @id @default(autoincrement())
-  name      String
-  spec      String?
-  unit      String   @default("台")
+  name      String   @unique
+  icon      String?
+  sortOrder Int      @default(0) @map("sort_order")
   remark    String?
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  models    DeviceModel[]
+
+  @@map("device_category")
+}
+
+// 设备型号字典
+model DeviceModel {
+  id         Int      @id @default(autoincrement())
+  name       String
+  spec       String?
+  unit       String   @default("台")
+  categoryId Int?     @map("category_id")
+  category   DeviceCategory? @relation(fields: [categoryId], references: [id])
+  remark     String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   stocks   FactoryDeviceStock[]
   parts    PartModel[]
 
   @@unique([name, spec])
+  @@index([categoryId])
   @@map("device_model")
 }
 
@@ -88,7 +110,7 @@ model PartModel {
   @@map("part_model")
 }
 
-// 各厂设备库存
+// 各厂设备库存（数量按 4 个状态分桶，quantity 是冗余汇总=4 桶之和）
 model FactoryDeviceStock {
   id             Int     @id @default(autoincrement())
   factoryId      Int     @map("factory_id")
@@ -96,6 +118,10 @@ model FactoryDeviceStock {
   deviceModelId  Int     @map("device_model_id")
   deviceModel    DeviceModel @relation(fields: [deviceModelId], references: [id])
   quantity       Int     @default(0)
+  qtyInUse       Int     @default(0) @map("qty_in_use")
+  qtyStandby     Int     @default(0) @map("qty_standby")
+  qtyIdle        Int     @default(0) @map("qty_idle")
+  qtyStopped     Int     @default(0) @map("qty_stopped")
   remark         String?
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
@@ -156,7 +182,7 @@ model ChangeLog {
   @@map("change_log")
 }
 
-// 跨厂调动消息
+// 跨厂调动消息（审批通过/直接调拨执行后落库）
 model TransferMessage {
   id            Int      @id @default(autoincrement())
   fromFactoryId Int      @map("from_factory_id")
@@ -174,4 +200,40 @@ model TransferMessage {
 
   @@index([createdAt])
   @@map("transfer_message")
+}
+
+enum TransferRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+// 跨厂调动申请单
+model TransferRequest {
+  id            Int      @id @default(autoincrement())
+  fromFactoryId Int      @map("from_factory_id")
+  fromFactory   Factory  @relation("RequestFrom", fields: [fromFactoryId], references: [id])
+  toFactoryId   Int      @map("to_factory_id")
+  toFactory     Factory  @relation("RequestTo", fields: [toFactoryId], references: [id])
+  targetType    ChangeTargetType @map("target_type")
+  targetId      Int      @map("target_id")
+  targetName    String   @map("target_name")
+  quantity      Int
+  status        TransferRequestStatus @default(PENDING)
+  applicantId   Int      @map("applicant_id")
+  applicant     User     @relation("RequestApplicant", fields: [applicantId], references: [id])
+  applicantRemark String? @map("applicant_remark")
+  reviewerId    Int?     @map("reviewer_id")
+  reviewer      User?    @relation("RequestReviewer", fields: [reviewerId], references: [id])
+  reviewRemark  String?  @map("review_remark")
+  reviewedAt    DateTime? @map("reviewed_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@index([status, createdAt])
+  @@index([fromFactoryId])
+  @@index([toFactoryId])
+  @@map("transfer_request")
 }

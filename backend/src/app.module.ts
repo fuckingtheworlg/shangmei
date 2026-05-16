@@ -7,6 +7,7 @@ import { FactoryModule } from './modules/factory/factory.module';
 import { UserModule } from './modules/user/user.module';
 import { DeviceModelModule } from './modules/device-model/device-model.module';
 import { PartModelModule } from './modules/part-model/part-model.module';
+import { CategoryModule } from './modules/category/category.module';
 import { StockModule } from './modules/stock/stock.module';
 import { ChangeLogModule } from './modules/change-log/change-log.module';
 import { TransferModule } from './modules/transfer/transfer.module';
@@ -22,6 +23,7 @@ import { JwtAuthGuard } from './modules/auth/guards/jwt-auth.guard';
     AuthModule,
     FactoryModule,
     UserModule,
+    CategoryModule,
     DeviceModelModule,
     PartModelModule,
     StockModule,

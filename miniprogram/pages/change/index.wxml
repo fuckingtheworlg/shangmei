@@ -2,6 +2,9 @@
   <view class="tab-bar">
     <view class="tab {{tab === 'change' ? 'active' : ''}}" bindtap="switchTab" data-tab="change">设备变动</view>
     <view class="tab {{tab === 'message' ? 'active' : ''}}" bindtap="switchTab" data-tab="message">跨厂消息</view>
+    <view class="tab {{tab === 'request' ? 'active' : ''}}" bindtap="switchTab" data-tab="request">
+      调动申请<text wx:if="{{pendingBadge}}" class="badge">{{pendingBadge}}</text>
+    </view>
   </view>
 
   <block wx:if="{{tab === 'change'}}">
@@ -36,7 +39,7 @@
     </view>
   </block>
 
-  <block wx:else>
+  <block wx:elif="{{tab === 'message'}}">
     <view wx:if="{{!messages.length}}" class="empty">暂无消息</view>
     <view wx:for="{{messages}}" wx:key="id" class="card msg-card">
       <view style="font-weight:500;">
@@ -49,6 +52,35 @@
       </view>
       <view class="muted" style="margin-top:4rpx;">操作人：{{item.operatorName}} · {{item.timeText}}</view>
       <view wx:if="{{item.remark}}" class="muted" style="margin-top:4rpx;">备注：{{item.remark}}</view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view class="card" style="margin:20rpx;" bindtap="goRequestPage">
+      <view class="row" style="justify-content:space-between;">
+        <view>
+          <view style="font-weight:600;">查看完整调动申请列表</view>
+          <view class="muted small">含待审批 / 已通过 / 已拒绝 / 已取消</view>
+        </view>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+    <view wx:if="{{!requests.length}}" class="empty">暂无申请</view>
+    <view wx:for="{{requests}}" wx:key="id" class="card req-card">
+      <view class="row" style="justify-content:space-between;">
+        <view class="from-to">
+          <text class="fac">{{item.fromFactoryName}}</text>
+          <text class="arrow"> → </text>
+          <text class="fac">{{item.toFactoryName}}</text>
+        </view>
+        <view class="status status-{{item.status}}">{{statusText[item.status]}}</view>
+      </view>
+      <view class="muted" style="margin-top:8rpx;">
+        {{item.targetType === 'DEVICE' ? '设备' : '配件'}} · {{item.targetName}} · {{item.quantity}}
+      </view>
+      <view class="muted small" style="margin-top:4rpx;">
+        {{item.applicantName}} · {{item.timeText}}
+      </view>
     </view>
   </block>
 </view>

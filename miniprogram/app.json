@@ -4,10 +4,12 @@
     "pages/login/login",
     "pages/device/list",
     "pages/device/detail",
+    "pages/device/edit",
     "pages/change/index",
     "pages/mine/index",
     "pages/mine/profile",
     "pages/transfer/index",
+    "pages/transfer/list",
     "pages/model/device-form",
     "pages/model/part-form"
   ],
