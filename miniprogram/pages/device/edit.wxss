@@ -5,31 +5,57 @@
 
 .b-row {
   display: flex; align-items: center;
-  padding: 24rpx 0; border-bottom: 1rpx solid #f0f0f0;
+  padding: 28rpx 0; border-bottom: 1rpx solid #f0f0f0;
 }
 .b-row:last-child { border-bottom: none; }
+
 .b-tag {
   display: inline-block;
-  padding: 8rpx 24rpx; border-radius: 16rpx;
-  font-size: 26rpx; font-weight: 600;
-  width: 100rpx; text-align: center;
+  flex-shrink: 0;
+  padding: 8rpx 20rpx;
+  border-radius: 14rpx;
+  font-size: 26rpx;
+  font-weight: 600;
+  white-space: nowrap;
+  text-align: center;
 }
 .b-tag.in-use   { background:#e6f7ff; color:#1890ff; }
 .b-tag.standby  { background:#f6ffed; color:#52c41a; }
 .b-tag.idle     { background:#fff7e6; color:#fa8c16; }
 .b-tag.stopped  { background:#f9f0ff; color:#722ed1; }
+.b-tag.remark-tag { background:#fafafa; color:#888; }
 
-.b-actions { flex: 1; display: flex; align-items: center; gap: 16rpx; justify-content: flex-end; }
+.b-actions {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24rpx;
+}
 .b-btn {
-  width: 60rpx; height: 60rpx; line-height: 60rpx;
-  border-radius: 50%; background: #f5f5f5;
-  font-size: 32rpx; padding: 0;
+  width: 64rpx; height: 64rpx;
+  line-height: 60rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 36rpx;
+  font-weight: 600;
+  user-select: none;
 }
-.b-btn::after { border: none; }
+.b-btn.minus { background: #fff1f0; color: #f5222d; }
+.b-btn.plus  { background: #e6f7ff; color: #1890ff; }
+.b-btn:active { opacity: 0.6; }
+
 .b-input {
-  width: 140rpx; text-align: center;
-  height: 60rpx; line-height: 60rpx;
-  border: 1rpx solid #e8e8e8; border-radius: 10rpx;
-  font-size: 30rpx; font-weight: 600;
+  width: 120rpx;
+  text-align: center;
+  height: 64rpx;
+  line-height: 64rpx;
+  border: 1rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  background: #fafafa;
 }
-.remark { flex: 1; text-align: right; padding: 0 12rpx; }
+
+.remark-row { padding: 24rpx 0; }
+.remark { flex: 1; text-align: right; padding: 0 12rpx; font-size: 28rpx; }

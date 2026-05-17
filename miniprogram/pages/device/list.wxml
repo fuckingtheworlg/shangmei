@@ -75,7 +75,7 @@
     </view>
 
     <view wx:if="{{isWriter}}" class="row qty-actions" catchtap="noop">
-      <button class="qty-btn edit" catchtap="editStock" data-item="{{item}}">分桶编辑</button>
+      <button class="qty-btn edit" catchtap="editStock" data-item="{{item}}">编辑数量</button>
     </view>
   </view>
 </view>

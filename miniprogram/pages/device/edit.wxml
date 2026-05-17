@@ -8,37 +8,37 @@
     <view class="b-row">
       <view class="b-tag in-use">在用</view>
       <view class="b-actions">
-        <button class="b-btn" data-key="inUse" data-d="-1" bindtap="step">−</button>
+        <view class="b-btn minus" data-key="inUse" data-d="-1" bindtap="step">−</view>
         <input class="b-input" type="digit" value="{{inUse}}" bindinput="onInput" data-key="inUse" />
-        <button class="b-btn" data-key="inUse" data-d="1" bindtap="step">+</button>
+        <view class="b-btn plus" data-key="inUse" data-d="1" bindtap="step">+</view>
       </view>
     </view>
     <view class="b-row">
       <view class="b-tag standby">备用</view>
       <view class="b-actions">
-        <button class="b-btn" data-key="standby" data-d="-1" bindtap="step">−</button>
+        <view class="b-btn minus" data-key="standby" data-d="-1" bindtap="step">−</view>
         <input class="b-input" type="digit" value="{{standby}}" bindinput="onInput" data-key="standby" />
-        <button class="b-btn" data-key="standby" data-d="1" bindtap="step">+</button>
+        <view class="b-btn plus" data-key="standby" data-d="1" bindtap="step">+</view>
       </view>
     </view>
     <view class="b-row">
       <view class="b-tag idle">闲置</view>
       <view class="b-actions">
-        <button class="b-btn" data-key="idle" data-d="-1" bindtap="step">−</button>
+        <view class="b-btn minus" data-key="idle" data-d="-1" bindtap="step">−</view>
         <input class="b-input" type="digit" value="{{idle}}" bindinput="onInput" data-key="idle" />
-        <button class="b-btn" data-key="idle" data-d="1" bindtap="step">+</button>
+        <view class="b-btn plus" data-key="idle" data-d="1" bindtap="step">+</view>
       </view>
     </view>
     <view class="b-row">
       <view class="b-tag stopped">停用</view>
       <view class="b-actions">
-        <button class="b-btn" data-key="stopped" data-d="-1" bindtap="step">−</button>
+        <view class="b-btn minus" data-key="stopped" data-d="-1" bindtap="step">−</view>
         <input class="b-input" type="digit" value="{{stopped}}" bindinput="onInput" data-key="stopped" />
-        <button class="b-btn" data-key="stopped" data-d="1" bindtap="step">+</button>
+        <view class="b-btn plus" data-key="stopped" data-d="1" bindtap="step">+</view>
       </view>
     </view>
-    <view class="b-row">
-      <view class="b-tag" style="background:#fafafa;color:#666;">备注</view>
+    <view class="b-row remark-row">
+      <view class="b-tag remark-tag">备注</view>
       <input class="remark" placeholder="可选" value="{{remark}}" bindinput="onRemark" />
     </view>
   </view>
