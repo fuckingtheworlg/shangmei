@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 彬渭中心设备管理系统 - 一键安装脚本（Ubuntu 22.04 / 24.04）
+# 彬渭运营中心设备管理系统 - 一键安装脚本（Ubuntu 22.04 / 24.04）
 # 在干净的服务器上以 root 运行
 # 完成：基础环境、MySQL、建库、Node 20、PM2、Nginx、依赖、构建、systemd
 set -euo pipefail

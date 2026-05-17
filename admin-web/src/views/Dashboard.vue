@@ -4,7 +4,7 @@
     <div class="db-header">
       <div class="db-title">
         <span class="logo-dot"></span>
-        彬渭中心 · 设备配件管控驾驶舱
+        彬渭运营中心 · 设备配件管控驾驶舱
       </div>
       <div class="db-meta">
         <span class="meta-item">{{ now }}</span>

@@ -118,7 +118,7 @@ export class TransferRequestService {
   /** 中心通过申请：执行实际调拨（事务） */
   async approve(current: UserPayload, id: number, reviewRemark?: string) {
     if (current.role !== 'SUPER_ADMIN') {
-      throw new BadRequestException('仅彬渭中心可审批');
+      throw new BadRequestException('仅彬渭运营中心可审批');
     }
     const req = await this.prisma.transferRequest.findUnique({ where: { id } });
     if (!req) throw new NotFoundException('申请不存在');
@@ -153,7 +153,7 @@ export class TransferRequestService {
 
   async reject(current: UserPayload, id: number, reviewRemark: string) {
     if (current.role !== 'SUPER_ADMIN') {
-      throw new BadRequestException('仅彬渭中心可审批');
+      throw new BadRequestException('仅彬渭运营中心可审批');
     }
     const req = await this.prisma.transferRequest.findUnique({ where: { id } });
     if (!req) throw new NotFoundException('申请不存在');

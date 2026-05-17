@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <div class="title">彬渭中心管理后台</div>
+      <div class="title">彬渭运营中心管理后台</div>
       <el-form :model="form" label-width="60px" @submit.prevent>
         <el-form-item label="账号">
           <el-input v-model="form.username" placeholder="账号" />
@@ -37,7 +37,7 @@ async function submit() {
   try {
     const res = await authApi.login(form);
     if (!res.user.isCenter && res.user.role !== 'SUPER_ADMIN') {
-      ElMessage.warning('管理后台仅限彬渭中心账号登录');
+      ElMessage.warning('管理后台仅限彬渭运营中心账号登录');
       return;
     }
     store.setLogin(res.token, res.user);

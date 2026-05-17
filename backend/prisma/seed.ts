@@ -5,9 +5,9 @@ const prisma = new PrismaClient();
 
 async function main() {
   const center = await prisma.factory.upsert({
-    where: { name: '彬渭中心' },
+    where: { name: '彬渭运营中心' },
     update: { isCenter: true },
-    create: { name: '彬渭中心', code: 'BWZX', isCenter: true },
+    create: { name: '彬渭运营中心', code: 'BWZX', isCenter: true },
   });
 
   const factories = [

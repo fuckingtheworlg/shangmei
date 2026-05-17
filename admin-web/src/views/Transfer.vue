@@ -36,7 +36,7 @@
         <el-form-item label="申请说明"><el-input v-model="form.applicantRemark" type="textarea" :rows="2" /></el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitRequest" :loading="loading">提交申请</el-button>
-          <span class="muted" style="margin-left:12px;">提交后由彬渭中心审批，通过后自动调拨</span>
+          <span class="muted" style="margin-left:12px;">提交后由彬渭运营中心审批，通过后自动调拨</span>
         </el-form-item>
       </el-form>
     </div>

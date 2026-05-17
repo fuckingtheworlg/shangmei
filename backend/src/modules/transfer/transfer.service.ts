@@ -26,7 +26,7 @@ export class TransferService {
 
   async transfer(current: UserPayload, input: TransferInput) {
     if (current.role !== 'SUPER_ADMIN') {
-      throw new BadRequestException('仅彬渭中心可执行免审直接调拨');
+      throw new BadRequestException('仅彬渭运营中心可执行免审直接调拨');
     }
     if (input.fromFactoryId === input.toFactoryId) {
       throw new BadRequestException('调入调出工厂不能相同');

@@ -9,7 +9,7 @@ Page({
     if (!user.isCenter) {
       wx.showModal({
         title: '提示',
-        content: '仅彬渭中心可新建设备型号',
+        content: '仅彬渭运营中心可新建设备型号',
         showCancel: false,
         success: () => wx.navigateBack()
       });

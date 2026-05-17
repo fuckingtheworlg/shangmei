@@ -1,7 +1,7 @@
 <template>
   <div class="layout">
     <aside class="sider">
-      <div class="brand">彬渭中心</div>
+      <div class="brand">彬渭运营中心</div>
       <el-menu :default-active="$route.path" router background-color="transparent" text-color="#cbd5e1" active-text-color="#fff">
         <el-menu-item index="/dashboard">工作台</el-menu-item>
         <el-menu-item index="/stock">库存总览</el-menu-item>

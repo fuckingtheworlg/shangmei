@@ -3,7 +3,7 @@ import { UserPayload } from '../types/user-payload.type';
 
 /**
  * 校验当前用户是否有权限访问目标 factoryId
- * - SUPER_ADMIN（彬渭中心）：可访问任何工厂
+ * - SUPER_ADMIN（彬渭运营中心）：可访问任何工厂
  * - 其他角色：仅可访问本厂
  * 当未传 targetFactoryId 时返回用户应被限制的 factoryId（中心返回 undefined 表示不限制）
  */

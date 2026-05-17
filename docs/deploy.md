@@ -38,7 +38,7 @@ npm run start:dev         # http://localhost:3000/api
 
 | 账号 | 密码 | 角色 |
 |------|------|------|
-| `admin` | `admin123` | 超级管理员（彬渭中心） |
+| `admin` | `admin123` | 超级管理员（彬渭运营中心） |
 | `factory1` | `factory123` | 第一分厂管理员 |
 | `worker1` | `user123` | 第一分厂员工 |
 

@@ -1,7 +1,7 @@
 {
   "name": "shangmei-backend",
   "version": "0.1.0",
-  "description": "彬渭中心设备配件管理系统 - 后端服务",
+  "description": "彬渭运营中心设备配件管理系统 - 后端服务",
   "private": true,
   "scripts": {
     "prebuild": "rimraf dist",

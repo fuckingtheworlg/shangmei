@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 工厂（含彬渭中心，isCenter=true 表示中心）
+// 工厂（含彬渭运营中心，isCenter=true 表示中心）
 model Factory {
   id        Int      @id @default(autoincrement())
   name      String   @unique

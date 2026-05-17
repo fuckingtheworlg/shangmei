@@ -10,7 +10,7 @@
       <el-table-column prop="code" label="编码" width="120" />
       <el-table-column label="类型" width="120">
         <template #default="{ row }">
-          <el-tag v-if="row.isCenter" type="warning">彬渭中心</el-tag>
+          <el-tag v-if="row.isCenter" type="warning">彬渭运营中心</el-tag>
           <el-tag v-else>分厂</el-tag>
         </template>
       </el-table-column>

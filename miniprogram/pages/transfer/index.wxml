@@ -1,7 +1,7 @@
 <view class="container">
   <view class="info-card">
     <view class="info-title">提交跨厂调动申请</view>
-    <view class="info-sub">提交后由彬渭中心审批，通过后自动调拨</view>
+    <view class="info-sub">提交后由彬渭运营中心审批，通过后自动调拨</view>
   </view>
 
   <view class="card">
